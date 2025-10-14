@@ -1,0 +1,71 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+    .loading-spinner {
+        @apply inline-block h-5 w-5 rounded-full border-2 border-current border-t-transparent align-middle;
+        animation: spin 0.9s linear infinite;
+    }
+
+    .stat-number.updated {
+        animation: fadeInUp 0.35s ease-out both;
+    }
+
+    .transition-optimized {
+        will-change: transform, opacity;
+    }
+
+    .dashboard-container {
+        contain: layout;
+    }
+}
+
+canvas {
+    contain: layout style paint;
+}
+
+img.lazy {
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+img.lazy.loaded {
+    opacity: 1;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1.5rem;
+    }
+}
+
+@media print {
+    .no-print {
+        display: none !important;
+    }
+}
