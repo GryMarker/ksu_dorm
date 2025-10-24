@@ -163,18 +163,43 @@
                         <p class="text-sm text-slate-600">Please review the KSU dormitory policies before submitting your application.</p>
                     </div>
                     <div class="max-h-56 overflow-y-auto rounded-2xl border border-slate-200 bg-white/80 p-5 text-sm leading-relaxed text-slate-600">
-                        <p class="mb-3">
-                            Kalinga State University maintains a safe, inclusive, and academically supportive dormitory environment. Students are expected to respect dorm staff,
-                            fellow residents, and university property. Curfew hours, visitor logs, and attendance monitoring must be observed at all times.
-                        </p>
-                        <p class="mb-3">
-                            Residents must participate in routine inspections, emergency drills, and scheduled community engagements. Any damages to dorm facilities will be
-                            charged accordingly. Alcohol, prohibited substances, and weapons are strictly banned within dorm premises.
-                        </p>
-                        <p>
-                            Violations of these policies may result in disciplinary action, suspension of dorm privileges, or dismissal from the residence halls. By applying, you
-                            agree to uphold the values of KSU and abide by all dormitory regulations.
-                        </p>
+                        <pre class="whitespace-pre-wrap font-sans text-xs sm:text-sm">
+DORMITORY POLICIES AND GUIDELINES
+
+1.KSU student/s who wants to stay in the dormitory while enrolled in the University must file an application at the Office of the Student Development Services and Placement Services with the attached enrolment form and photocopy of school ID.
+2. After the office receives the application form, the dormitory in-charge will interview the applicant.
+3. Applicants who passed the interview and the screening will be called to sign the agreement form.
+4. Duly signed agreement form shall be signed by the dorm-in-charge and presented to the accounting office as basis for payments as initial/full payment of dorm fee as stipulated and approved by school authorities. For this purpose, the dorm fee is Php500.00 per month inclusive of electricity and water.
+5. The dormitarians must abide by the house rules ser forth by the dorm-in-charge which are as follows:
+5.1 Must provide his/her beddings, kitchen utensils, among others;
+5.2 Observe the proper use, care and maintenance of all dorm facilities like the comfort room, lockers and other furniture;
+5.3 Help in the maintenance of cleanliness and sanitation of the dormitory and its premises;
+5.4 Observe at all times conservation measures and safety practices such as switching off lights, putting off electronic gadgets and equipment (radio, flat irons, and electric fans) and the closing of water faucets and the like when not in use;
+5.5 Must fill-up and sign properly the logbook whenever leaving the dormitory except when going to school to attend classes;
+5.6 Observe the curfew hour set by school authorities at 7:00 PM to 4:00 AM. In case the dorm occupant goes out and return back within the curfew period, he/she must secure a pass slip duly signed by the in-charge, which will serve as her passport to be presented to the guard on duty;
+5.7 Visitors are to be entertained only at the dorm lobby;
+5.8 Parents or guardians may be allowed to sleep overnight subject to house rules; and
+5.9 One room in the dormitory is reserved for transient visitors with a corresponding fee.
+6. Prohibited Items. The following items are strictly prohibited in the dormitory:
+6.1 Illegal drugs and paraphernalia
+6.2 Alcoholic beverages
+6.3 Firearms and other weapons
+6.4 Flammable materials (e.g., candles, fireworks)
+6.5 Pets (with exceptions for service animals)
+6.6 Cooking appliances in rooms (unless designated kitchen areas are provided)
+7. Violations of these policies may result in disciplinary action, including:
+7.1 First offense- Verbal Warnings to be written in the anecdotal record
+7.2 Second offense- Written Letter and conference with the OSDSPS and MDS to be written in the anecdotal record.
+7.3 Third Offense- Room restrictions, Loss of dormitory privileges and Eviction from the dormitory to be written in the anecdotal record.
+8. Grievance Procedure:
+8.1 Residents with concerns or grievances should first attempt to resolve them with their roommates or dormitory staff.
+8.2 If the issue remains unresolved, residents may submit a formal grievance to the appropriate authorities.
+9. Amendments:
+9.1 These policies are subject to change at the discretion of the dormitory administration.
+9.2 Residents will be notified of any policy changes in a timely manner.
+
+I hereby adhere to all above-mentioned policies; any violations of the policies on my part will mean my removal form the dormitory.
+                        </pre>
                     </div>
                     <label class="flex items-start gap-3 text-sm text-slate-700">
                         <input
@@ -208,4 +233,3 @@
         </x-ksu-card>
     </div>
 </x-ksu-layout>
-
