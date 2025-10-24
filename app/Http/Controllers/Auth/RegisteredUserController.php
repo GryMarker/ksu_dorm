@@ -37,6 +37,7 @@ class RegisteredUserController extends Controller
         ]);
 
         $user->tenant()->create([
+            'full_name' => $request->name,
             'type' => Tenant::TYPE_STUDENT,
             'university_id_no' => 'PENDING-' . Str::upper(Str::random(6)),
             'program' => null,
