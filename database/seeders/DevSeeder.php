@@ -75,6 +75,7 @@ class DevSeeder extends Seeder
         $draftUser->tenant()->create([
             'full_name' => 'Draft Applicant',
             'nickname' => 'Applicant',
+            'gender' => Tenant::GENDER_FEMALE,
             'dob' => Carbon::now()->subYears(18)->subMonths(3),
             'home_address' => 'Tabuk City, Kalinga',
             'age' => 18,
@@ -112,6 +113,7 @@ class DevSeeder extends Seeder
             $tenant = $user->tenant()->create([
                 'full_name' => 'Tenant ' . $i,
                 'nickname' => 'T' . $i,
+                'gender' => $i % 2 === 0 ? Tenant::GENDER_MALE : Tenant::GENDER_FEMALE,
                 'dob' => Carbon::now()->subYears(18 + $i)->subMonths($i),
                 'home_address' => 'Barangay ' . $i . ', Tabuk City',
                 'age' => 18 + $i,
