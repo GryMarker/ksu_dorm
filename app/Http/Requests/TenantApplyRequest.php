@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Tenant;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class TenantApplyRequest extends FormRequest
 {
@@ -16,6 +18,7 @@ class TenantApplyRequest extends FormRequest
         return [
             'full_name' => ['required', 'string', 'max:255'],
             'nickname' => ['nullable', 'string', 'max:255'],
+            'gender' => ['required', Rule::in([Tenant::GENDER_MALE, Tenant::GENDER_FEMALE])],
             'dob' => ['required', 'date', 'before:today'],
             'home_address' => ['required', 'string'],
             'age' => ['required', 'integer', 'min:15', 'max:120'],

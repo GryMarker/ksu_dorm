@@ -21,10 +21,14 @@ class Tenant extends Model
     public const STATUS_REJECTED = 'rejected';
     public const STATUS_RECHECK = 'recheck';
 
+    public const GENDER_MALE = 'male';
+    public const GENDER_FEMALE = 'female';
+
     protected $fillable = [
         'user_id',
         'full_name',
         'nickname',
+        'gender',
         'dob',
         'home_address',
         'age',

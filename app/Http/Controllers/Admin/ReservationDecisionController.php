@@ -145,8 +145,18 @@ class ReservationDecisionController extends Controller
 
     private function handleInitialAssignment($tenant, Reservation $reservation, Bed $bed): void
     {
-        if ($tenant->activeAssignment) {
-            abort(400, 'Tenant already has an active assignment.');
+        $currentAssignment = $tenant->activeAssignment;
+
+        if ($currentAssignment) {
+            if ($currentAssignment->room_id === $reservation->room_id && $currentAssignment->bed_id === $bed->id) {
+                if ($bed->is_occupied === false || $bed->occupant_tenant_id !== $tenant->id) {
+                    $this->activateBed($bed, $tenant->id);
+                }
+
+                return;
+            }
+
+            $this->releaseAssignment($currentAssignment, 'reassignment');
         }
 
         $this->activateBed($bed, $tenant->id);
@@ -168,18 +178,7 @@ class ReservationDecisionController extends Controller
             abort(400, 'Tenant has no active assignment to transfer from.');
         }
 
-        $currentAssignment->update([
-            'is_active' => false,
-            'end_date' => Carbon::today(),
-            'moved_out_reason' => 'transfer',
-        ]);
-
-        if ($currentAssignment->bed) {
-            $currentAssignment->bed->update([
-                'is_occupied' => false,
-                'occupant_tenant_id' => null,
-            ]);
-        }
+        $this->releaseAssignment($currentAssignment, 'transfer');
 
         $this->activateBed($bed, $tenant->id);
 
@@ -199,7 +198,22 @@ class ReservationDecisionController extends Controller
             'occupant_tenant_id' => $tenantId,
         ]);
     }
-}
 
+    private function releaseAssignment(Assignment $assignment, string $reason): void
+    {
+        $assignment->update([
+            'is_active' => false,
+            'end_date' => Carbon::today(),
+            'moved_out_reason' => $reason,
+        ]);
+
+        if ($assignment->bed) {
+            $assignment->bed->update([
+                'is_occupied' => false,
+                'occupant_tenant_id' => null,
+            ]);
+        }
+    }
+}
 
 

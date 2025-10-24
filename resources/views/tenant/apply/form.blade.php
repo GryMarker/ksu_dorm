@@ -69,6 +69,20 @@
                                 <x-input-error :messages="$errors->get('nickname')" />
                             </div>
                             <div class="space-y-2">
+                                <x-input-label for="gender" value="Gender" />
+                                <select
+                                    id="gender"
+                                    name="gender"
+                                    class="mt-1 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-ksu-600 focus:outline-none focus:ring-ksu-400"
+                                    required
+                                >
+                                    <option value="" disabled @selected(!old('gender', $tenant->gender))>Select gender</option>
+                                    <option value="male" @selected(old('gender', $tenant->gender) === 'male')>Male</option>
+                                    <option value="female" @selected(old('gender', $tenant->gender) === 'female')>Female</option>
+                                </select>
+                                <x-input-error :messages="$errors->get('gender')" />
+                            </div>
+                            <div class="space-y-2">
                                 <x-input-label for="dob" value="Date of Birth" />
                                 <x-text-input id="dob" name="dob" type="date" class="mt-1 block w-full" :value="old('dob', optional($tenant->dob)->format('Y-m-d'))" required />
                                 <x-input-error :messages="$errors->get('dob')" />
