@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Tenant;
+namespace App\Http\Controllers\Employee;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TenantApplyRequest;
@@ -10,13 +10,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 
-class ApplyController extends Controller
+class EmployeeApplyController extends Controller
 {
     public function showForm(Request $request): View
     {
         $tenant = $request->user()->tenant()->firstOrFail();
 
-        return view('tenant.apply.form', [
+        abort_if($tenant->type !== Tenant::TYPE_EMPLOYEE, 403);
+
+        return view('employee.apply.form', [
             'tenant' => $tenant,
         ]);
     }
@@ -24,6 +26,9 @@ class ApplyController extends Controller
     public function submit(TenantApplyRequest $request): RedirectResponse
     {
         $tenant = $request->user()->tenant()->firstOrFail();
+
+        abort_if($tenant->type !== Tenant::TYPE_EMPLOYEE, 403);
+
         $data = $request->validated();
 
         $tenant->fill([
@@ -40,12 +45,13 @@ class ApplyController extends Controller
             'mother_contact' => $data['mother_contact'],
             'course_year' => $data['course_year'],
             'cellphone' => $data['cellphone'],
-            'policy_accepted_at' => Carbon::now(),
             'phone' => $data['cellphone'],
         ]);
 
+        $tenant->policy_accepted_at = Carbon::now();
+
         if (in_array($tenant->onboarding_status, [Tenant::STATUS_DRAFT, Tenant::STATUS_RECHECK], true)) {
-            $tenant->onboarding_status = Tenant::STATUS_FOR_INTERVIEW;
+            $tenant->onboarding_status = Tenant::STATUS_FOR_APPROVAL;
         }
 
         $tenant->save();
@@ -55,17 +61,7 @@ class ApplyController extends Controller
             $user->forceFill(['name' => $data['full_name']])->save();
         }
 
-        return redirect()->route('tenant.apply.slots')->with('status', 'Application submitted. Please choose an interview slot.');
-    }
-
-    public function status(Request $request): View
-    {
-        $tenant = $request->user()->tenant()->with(['interviews.slot' => fn ($query) => $query->orderBy('starts_at', 'desc')])->firstOrFail();
-        $latestInterview = $tenant->interviews()->latest('scheduled_at')->first();
-
-        return view('tenant.apply.status', [
-            'tenant' => $tenant,
-            'latestInterview' => $latestInterview,
-        ]);
+        return redirect()->route('employee.status')
+            ->with('status', 'Application submitted. Awaiting president approval.');
     }
 }

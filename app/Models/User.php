@@ -15,6 +15,8 @@ class User extends Authenticatable implements MustVerifyEmail
     public const ROLE_DORM_MASTER = 'dorm_master';
     public const ROLE_STUDENT_DIRECTOR = 'student_director';
     public const ROLE_TENANT = 'tenant';
+    public const ROLE_EMPLOYEE = 'employee';
+    public const ROLE_PRESIDENT = 'president';
 
     public const STATUS_ACTIVE = 'active';
     public const STATUS_PENDING = 'pending';
@@ -59,6 +61,16 @@ class User extends Authenticatable implements MustVerifyEmail
     public function isTenant(): bool
     {
         return $this->role === self::ROLE_TENANT;
+    }
+
+    public function isEmployee(): bool
+    {
+        return $this->role === self::ROLE_EMPLOYEE;
+    }
+
+    public function isPresident(): bool
+    {
+        return $this->role === self::ROLE_PRESIDENT;
     }
 
     public function getDisplayRoleAttribute(): string

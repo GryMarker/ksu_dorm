@@ -17,6 +17,7 @@ class Tenant extends Model
 
     public const STATUS_DRAFT = 'draft';
     public const STATUS_FOR_INTERVIEW = 'for_interview';
+    public const STATUS_FOR_APPROVAL = 'for_approval';
     public const STATUS_APPROVED = 'approved';
     public const STATUS_REJECTED = 'rejected';
     public const STATUS_RECHECK = 'recheck';
@@ -41,6 +42,8 @@ class Tenant extends Model
         'cellphone',
         'policy_accepted_at',
         'type',
+        'employee_id_number',
+        'onboarding_status',
         'university_id_no',
         'program',
         'year_level',
@@ -48,7 +51,6 @@ class Tenant extends Model
         'emergency_contact_name',
         'emergency_contact_phone',
         'medical_notes',
-        'admission_status',
         'admission_form_json',
     ];
 

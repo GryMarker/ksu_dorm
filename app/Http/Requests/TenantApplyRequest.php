@@ -10,7 +10,13 @@ class TenantApplyRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->isTenant() ?? false;
+        $user = $this->user();
+
+        if (!$user) {
+            return false;
+        }
+
+        return $user->isTenant() || $user->isEmployee();
     }
 
     public function rules(): array

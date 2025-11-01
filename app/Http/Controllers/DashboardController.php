@@ -15,14 +15,32 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
+        if ($user && $user->isEmployee()) {
+            $tenant = $user->tenant;
+
+            if (!$tenant) {
+                return redirect()->route('employee.apply.form');
+            }
+
+            if ($tenant->onboarding_status !== Tenant::STATUS_APPROVED) {
+                return redirect()->route('employee.status');
+            }
+
+            return redirect()->route('employee.dashboard');
+        }
+
         if ($user && $user->isTenant()) {
             $tenant = $user->tenant;
 
-            if (!$tenant || $tenant->admission_status !== Tenant::STATUS_APPROVED) {
+            if (!$tenant || $tenant->onboarding_status !== Tenant::STATUS_APPROVED) {
                 return redirect()->route('tenant.apply.form');
             }
 
             return redirect()->route('tenant.dashboard');
+        }
+
+        if ($user && $user->isPresident()) {
+            return redirect()->route('president.approvals.employees.index');
         }
 
         return app(AdminDashboardController::class)($request);

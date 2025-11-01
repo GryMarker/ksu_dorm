@@ -7,20 +7,25 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class EnsureTenantApproved
+class EnsureEmployeeApproved
 {
     public function handle(Request $request, Closure $next): Response
     {
         $user = $request->user();
 
-        if (!$user || !$user->isTenant()) {
+        if (!$user || !$user->isEmployee()) {
             return $next($request);
         }
 
         $tenant = $user->tenant;
 
-        if (!$tenant || $tenant->onboarding_status !== Tenant::STATUS_APPROVED) {
-            return redirect()->route('tenant.apply.form')->with('status', 'Finish your application and interview to proceed.');
+        if (!$tenant) {
+            return redirect()->route('employee.apply.form');
+        }
+
+        if ($tenant->onboarding_status !== Tenant::STATUS_APPROVED) {
+            return redirect()->route('employee.status')
+                ->with('status', 'Your onboarding is still pending approval.');
         }
 
         return $next($request);

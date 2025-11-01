@@ -21,7 +21,7 @@
                 <h1 class="text-3xl font-semibold text-ksu-900 sm:text-4xl">Room Availability</h1>
                 <p class="mt-1 text-sm text-slate-600">Browse open rooms and request a bed once your admission is approved.</p>
             </div>
-            @if ($tenant->admission_status !== TenantModel::STATUS_APPROVED)
+            @if ($tenant->onboarding_status !== TenantModel::STATUS_APPROVED)
                 <x-ksu-badge variant="pending" class="uppercase tracking-wide">
                     Waiting for approval
                 </x-ksu-badge>
@@ -91,7 +91,7 @@
                 @php
                     $vacantBeds = $room->beds->where('is_occupied', false);
                     $vacantCount = $vacantBeds->count();
-                    $isEligible = $tenant->admission_status === TenantModel::STATUS_APPROVED;
+                    $isEligible = $tenant->onboarding_status === TenantModel::STATUS_APPROVED;
                 @endphp
                 <tr
                     x-show="

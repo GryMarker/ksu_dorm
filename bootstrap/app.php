@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureEmployeeApproved;
 use App\Http\Middleware\EnsureTenantApproved;
 use App\Http\Middleware\RoleMiddleware;
 use App\Providers\AuthServiceProvider;
@@ -17,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'tenant.approved' => EnsureTenantApproved::class,
+            'employee.approved' => EnsureEmployeeApproved::class,
             'role' => RoleMiddleware::class,
         ]);
     })

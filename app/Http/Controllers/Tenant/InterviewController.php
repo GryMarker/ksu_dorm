@@ -71,8 +71,8 @@ class InterviewController extends Controller
             ]);
         }
 
-        if (in_array($tenant->admission_status, [Tenant::STATUS_DRAFT, Tenant::STATUS_RECHECK], true)) {
-            $tenant->admission_status = Tenant::STATUS_FOR_INTERVIEW;
+        if (in_array($tenant->onboarding_status, [Tenant::STATUS_DRAFT, Tenant::STATUS_RECHECK], true)) {
+            $tenant->onboarding_status = Tenant::STATUS_FOR_INTERVIEW;
             $tenant->save();
         }
 

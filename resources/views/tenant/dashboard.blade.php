@@ -22,10 +22,10 @@
         ->take(5)
         ->get();
 
-    $statusBadge = match ($tenant->admission_status) {
+    $statusBadge = match ($tenant->onboarding_status) {
         TenantModel::STATUS_APPROVED => 'approved',
         TenantModel::STATUS_REJECTED => 'rejected',
-        TenantModel::STATUS_FOR_INTERVIEW, TenantModel::STATUS_RECHECK => 'pending',
+        TenantModel::STATUS_FOR_INTERVIEW, TenantModel::STATUS_FOR_APPROVAL, TenantModel::STATUS_RECHECK => 'pending',
         default => 'info',
     };
 
@@ -45,10 +45,10 @@
                 <div class="flex items-start justify-between">
                     <div>
                         <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Admission Status</p>
-                        <p class="mt-3 text-2xl font-semibold text-ksu-900">{{ \Illuminate\Support\Str::headline($tenant->admission_status) }}</p>
+                        <p class="mt-3 text-2xl font-semibold text-ksu-900">{{ \Illuminate\Support\Str::headline($tenant->onboarding_status) }}</p>
                     </div>
                     <x-ksu-badge :variant="$statusBadge">
-                        {{ \Illuminate\Support\Str::headline($tenant->admission_status) }}
+                        {{ \Illuminate\Support\Str::headline($tenant->onboarding_status) }}
                     </x-ksu-badge>
                 </div>
             </x-ksu-card>
@@ -170,3 +170,4 @@
         </div>
     </div>
 </x-ksu-layout>
+

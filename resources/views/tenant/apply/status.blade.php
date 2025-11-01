@@ -1,7 +1,7 @@
 @php
     use App\Models\Tenant as TenantModel;
 
-    $status = $tenant->admission_status;
+    $status = $tenant->onboarding_status;
 
     $steps = [
         [
@@ -14,7 +14,7 @@
             'hint' => 'Attend your scheduled interview.',
             'state' => match ($status) {
                 TenantModel::STATUS_FOR_INTERVIEW => 'current',
-                TenantModel::STATUS_APPROVED, TenantModel::STATUS_REJECTED, TenantModel::STATUS_RECHECK => 'completed',
+                TenantModel::STATUS_FOR_APPROVAL, TenantModel::STATUS_APPROVED, TenantModel::STATUS_REJECTED, TenantModel::STATUS_RECHECK => 'completed',
                 default => 'upcoming',
             },
         ],
@@ -22,6 +22,7 @@
             'label' => 'Decision',
             'hint' => 'Await approval or further action.',
             'state' => match ($status) {
+                TenantModel::STATUS_FOR_APPROVAL => 'current',
                 TenantModel::STATUS_APPROVED => 'completed',
                 TenantModel::STATUS_REJECTED => 'rejected',
                 TenantModel::STATUS_RECHECK => 'recheck',
@@ -33,7 +34,7 @@
     $badgeVariant = match ($status) {
         TenantModel::STATUS_APPROVED => 'approved',
         TenantModel::STATUS_REJECTED => 'rejected',
-        TenantModel::STATUS_FOR_INTERVIEW, TenantModel::STATUS_RECHECK => 'pending',
+        TenantModel::STATUS_FOR_INTERVIEW, TenantModel::STATUS_FOR_APPROVAL, TenantModel::STATUS_RECHECK => 'pending',
         default => 'info',
     };
 @endphp
@@ -66,6 +67,9 @@
                             @break
                         @case(TenantModel::STATUS_FOR_INTERVIEW)
                             <p>Your application is queued for an interview. Book a slot and prepare your requirements.</p>
+                            @break
+                        @case(TenantModel::STATUS_FOR_APPROVAL)
+                            <p>Your interview is done. Awaiting final approval from the dorm administrators.</p>
                             @break
                         @case(TenantModel::STATUS_APPROVED)
                             <p>Congratulations! You are approved for dorm admission. Reserve a room to complete your onboarding.</p>

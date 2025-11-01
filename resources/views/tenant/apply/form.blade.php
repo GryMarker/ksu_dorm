@@ -1,7 +1,7 @@
 @php
     use App\Models\Tenant as TenantModel;
 
-    $status = $tenant->admission_status ?? TenantModel::STATUS_DRAFT;
+    $status = $tenant->onboarding_status ?? TenantModel::STATUS_DRAFT;
 
     $steps = [
         [
@@ -14,7 +14,7 @@
             'hint' => 'Book your schedule and attend the screening.',
             'state' => match ($status) {
                 TenantModel::STATUS_FOR_INTERVIEW => 'current',
-                TenantModel::STATUS_APPROVED, TenantModel::STATUS_REJECTED, TenantModel::STATUS_RECHECK => 'completed',
+                TenantModel::STATUS_FOR_APPROVAL, TenantModel::STATUS_APPROVED, TenantModel::STATUS_REJECTED, TenantModel::STATUS_RECHECK => 'completed',
                 default => 'upcoming',
             },
         ],
@@ -22,6 +22,7 @@
             'label' => 'Decision',
             'hint' => 'Receive the dorm admission result.',
             'state' => match ($status) {
+                TenantModel::STATUS_FOR_APPROVAL => 'current',
                 TenantModel::STATUS_APPROVED => 'completed',
                 TenantModel::STATUS_REJECTED => 'rejected',
                 TenantModel::STATUS_RECHECK => 'recheck',

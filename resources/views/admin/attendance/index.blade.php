@@ -5,6 +5,75 @@
             <p class="mt-1 text-sm text-slate-600">Review daily entries and exits across all tenants. Use filters to narrow the results.</p>
         </div>
 
+        @if (auth()->user()?->isDormMaster())
+            <x-ksu-card title="Record Manual Attendance">
+                <form method="POST" action="{{ route('admin.attendance.store') }}" class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                    @csrf
+                    <div class="space-y-2">
+                        <x-input-label for="manual_tenant_id" value="Tenant" />
+                        <select
+                            id="manual_tenant_id"
+                            name="tenant_id"
+                            class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-ksu-600 focus:outline-none focus:ring-ksu-400"
+                            required
+                        >
+                            <option value="">Select tenant</option>
+                            @foreach ($tenants as $tenant)
+                                <option value="{{ $tenant->id }}" @selected(old('tenant_id') == $tenant->id)>
+                                    {{ $tenant->user->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <x-input-error :messages="$errors->get('tenant_id')" />
+                    </div>
+
+                    <div class="space-y-2">
+                        <x-input-label for="manual_type" value="Type" />
+                        <select
+                            id="manual_type"
+                            name="type"
+                            class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-ksu-600 focus:outline-none focus:ring-ksu-400"
+                            required
+                        >
+                            <option value="in" @selected(old('type', 'in') === 'in')>Check-in</option>
+                            <option value="out" @selected(old('type') === 'out')>Check-out</option>
+                        </select>
+                        <x-input-error :messages="$errors->get('type')" />
+                    </div>
+
+                    <div class="space-y-2">
+                        <x-input-label for="manual_timestamp" value="Timestamp" />
+                        <x-text-input
+                            id="manual_timestamp"
+                            name="timestamp"
+                            type="datetime-local"
+                            :value="old('timestamp', now()->timezone(config('app.timezone'))->format('Y-m-d\TH:i'))"
+                            required
+                        />
+                        <x-input-error :messages="$errors->get('timestamp')" />
+                    </div>
+
+                    <div class="sm:col-span-2 lg:col-span-3 space-y-2">
+                        <x-input-label for="manual_remarks" value="Remarks (optional)" />
+                        <textarea
+                            id="manual_remarks"
+                            name="remarks"
+                            rows="2"
+                            class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-ksu-600 focus:outline-none focus:ring-ksu-400"
+                        >{{ old('remarks') }}</textarea>
+                        <x-input-error :messages="$errors->get('remarks')" />
+                    </div>
+
+                    <div class="sm:col-span-2 lg:col-span-3 flex flex-wrap items-center gap-3">
+                        <x-ksu-button type="submit">
+                            Log Attendance
+                        </x-ksu-button>
+                        <p class="text-xs text-slate-500">Entries are recorded with the "Manual Entry" device tag and your current IP.</p>
+                    </div>
+                </form>
+            </x-ksu-card>
+        @endif
+
         <x-ksu-card>
             <form method="GET" class="grid gap-4 sm:grid-cols-4">
                 <div class="space-y-2">

@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 
@@ -23,23 +24,36 @@ class RegisteredUserController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'user_type' => ['required', Rule::in([Tenant::TYPE_STUDENT, Tenant::TYPE_EMPLOYEE])],
+            'employee_id_number' => [
+                'nullable',
+                'string',
+                'min:1',
+                'max:255',
+                'unique:' . Tenant::class . ',employee_id_number',
+                'required_if:user_type,' . Tenant::TYPE_EMPLOYEE,
+            ],
         ]);
 
+        $userType = $validated['user_type'];
+
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => User::ROLE_TENANT,
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'role' => $userType === Tenant::TYPE_EMPLOYEE ? User::ROLE_EMPLOYEE : User::ROLE_TENANT,
         ]);
 
         $user->tenant()->create([
-            'full_name' => $request->name,
+            'full_name' => $validated['name'],
             'gender' => null,
-            'type' => Tenant::TYPE_STUDENT,
+            'type' => $userType,
+            'employee_id_number' => $userType === Tenant::TYPE_EMPLOYEE ? $validated['employee_id_number'] : null,
+            'onboarding_status' => $userType === Tenant::TYPE_EMPLOYEE ? Tenant::STATUS_FOR_APPROVAL : Tenant::STATUS_DRAFT,
             'university_id_no' => 'PENDING-' . Str::upper(Str::random(6)),
             'program' => null,
             'year_level' => null,
@@ -54,6 +68,8 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect()->route(
+            $userType === Tenant::TYPE_EMPLOYEE ? 'employee.apply.form' : 'tenant.apply.form'
+        );
     }
 }

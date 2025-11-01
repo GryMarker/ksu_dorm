@@ -44,7 +44,7 @@ class InterviewController extends Controller
 
         $tenant = $interview->tenant;
 
-        $tenant->admission_status = match ($validated['result']) {
+        $tenant->onboarding_status = match ($validated['result']) {
             'approved' => Tenant::STATUS_APPROVED,
             'rejected' => Tenant::STATUS_REJECTED,
             'recheck' => Tenant::STATUS_RECHECK,

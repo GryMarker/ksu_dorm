@@ -116,6 +116,7 @@
             <x-ksu-card title="Quick Links">
                 <div class="grid gap-3">
                     <x-ksu-button as="a" href="{{ route('admin.interviews.index') }}" full variant="subtle">Interview Queue</x-ksu-button>
+                    <x-ksu-button as="a" href="{{ route('admin.interview-slots.index') }}" full>Manage Interview Slots</x-ksu-button>
                     <x-ksu-button as="a" href="{{ route('admin.attendance.index') }}" full variant="outline">Attendance Reports</x-ksu-button>
                     <x-ksu-button as="a" href="{{ route('admin.rooms.index') }}" full>Manage Room Inventory</x-ksu-button>
                     <x-ksu-button as="a" href="{{ route('admin.reservations.index') }}" full variant="subtle">Pending Reservations</x-ksu-button>

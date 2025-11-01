@@ -14,6 +14,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class DevSeeder extends Seeder
 {
@@ -31,6 +32,48 @@ class DevSeeder extends Seeder
             'email' => 'director@ksu.test',
             'role' => User::ROLE_STUDENT_DIRECTOR,
             'password' => Hash::make('password'),
+        ]);
+
+        User::factory()->create([
+            'name' => 'University President',
+            'email' => 'president@ksu.test',
+            'role' => User::ROLE_PRESIDENT,
+            'password' => Hash::make('password'),
+        ]);
+
+        $employeeUser = User::factory()->create([
+            'name' => 'Sample Employee',
+            'email' => 'employee@ksu.test',
+            'role' => User::ROLE_EMPLOYEE,
+            'password' => Hash::make('password'),
+        ]);
+
+        $employeeUser->tenant()->create([
+            'full_name' => 'Sample Employee',
+            'nickname' => 'Emp',
+            'gender' => Tenant::GENDER_MALE,
+            'dob' => Carbon::now()->subYears(30)->subMonths(2),
+            'home_address' => 'KSU Administration Building',
+            'age' => 30,
+            'place_of_birth' => 'Tabuk City',
+            'father_name' => 'Employee Father',
+            'father_contact' => '0917-500-5000',
+            'mother_name' => 'Employee Mother',
+            'mother_contact' => '0918-600-6000',
+            'course_year' => 'University Administration Office',
+            'cellphone' => '0917-777-8888',
+            'policy_accepted_at' => Carbon::now()->subDay(),
+            'type' => Tenant::TYPE_EMPLOYEE,
+            'employee_id_number' => 'EMP-1001',
+            'university_id_no' => 'EMP-' . Str::upper(Str::random(6)),
+            'program' => null,
+            'year_level' => null,
+            'phone' => '0917-777-8888',
+            'emergency_contact_name' => 'Employee Emergency',
+            'emergency_contact_phone' => '0918-555-4444',
+            'medical_notes' => null,
+            'onboarding_status' => Tenant::STATUS_FOR_APPROVAL,
+            'admission_form_json' => ['reason' => 'Access dorm systems'],
         ]);
 
         $rooms = collect([
@@ -95,7 +138,7 @@ class DevSeeder extends Seeder
             'emergency_contact_name' => 'Guardian Applicant',
             'emergency_contact_phone' => '0918-123-4567',
             'medical_notes' => null,
-            'admission_status' => Tenant::STATUS_DRAFT,
+            'onboarding_status' => Tenant::STATUS_DRAFT,
             'admission_form_json' => ['focus' => 'Initial application'],
         ]);
 
@@ -133,14 +176,14 @@ class DevSeeder extends Seeder
                 'emergency_contact_name' => 'Contact ' . $i,
                 'emergency_contact_phone' => '0918-100-00' . $i,
                 'medical_notes' => Arr::random([null, 'Allergic to peanuts', 'Requires lower bunk']),
-                'admission_status' => $status,
+                'onboarding_status' => $status,
                 'admission_form_json' => ['interest' => Arr::random(['Sports', 'Music', 'Reading'])],
             ]);
 
             $tenants->push($tenant);
         }
 
-        $approvedTenants = $tenants->where('admission_status', Tenant::STATUS_APPROVED)->values();
+        $approvedTenants = $tenants->where('onboarding_status', Tenant::STATUS_APPROVED)->values();
         foreach ($approvedTenants->take(3) as $i => $tenant) {
             $room = $rooms[$i % $rooms->count()];
             $bed = $room->beds()->where('is_occupied', false)->first();
@@ -175,7 +218,7 @@ class DevSeeder extends Seeder
             ->mapWithKeys(fn (InterviewSlot $slot) => [$slot->id => 0])
             ->toArray();
 
-        $pendingTenants = $tenants->where('admission_status', Tenant::STATUS_FOR_INTERVIEW)->values();
+        $pendingTenants = $tenants->where('onboarding_status', Tenant::STATUS_FOR_INTERVIEW)->values();
         foreach ($pendingTenants as $tenant) {
             foreach ($slots as $slot) {
                 if ($slotCapacities[$slot->id] < $slot->capacity) {
@@ -212,3 +255,7 @@ class DevSeeder extends Seeder
         }
     }
 }
+
+
+
+

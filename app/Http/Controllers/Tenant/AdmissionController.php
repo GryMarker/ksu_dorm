@@ -47,8 +47,8 @@ class AdmissionController extends Controller
 
         $action = $request->input('action', 'save');
 
-        if ($action === 'submit' && in_array($tenant->admission_status, [Tenant::STATUS_DRAFT, Tenant::STATUS_RECHECK], true)) {
-            $tenant->admission_status = Tenant::STATUS_FOR_INTERVIEW;
+        if ($action === 'submit' && in_array($tenant->onboarding_status, [Tenant::STATUS_DRAFT, Tenant::STATUS_RECHECK], true)) {
+            $tenant->onboarding_status = Tenant::STATUS_FOR_INTERVIEW;
         }
 
         $tenant->save();
@@ -67,8 +67,8 @@ class AdmissionController extends Controller
             'notes' => $request->input('notes'),
         ]);
 
-        if ($tenant->admission_status !== Tenant::STATUS_APPROVED) {
-            $tenant->admission_status = Tenant::STATUS_FOR_INTERVIEW;
+        if ($tenant->onboarding_status !== Tenant::STATUS_APPROVED) {
+            $tenant->onboarding_status = Tenant::STATUS_FOR_INTERVIEW;
             $tenant->save();
         }
 

@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\AttendanceLog;
 use App\Models\Tenant;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class AttendanceController extends Controller
@@ -33,5 +35,33 @@ class AttendanceController extends Controller
             'tenants' => $tenants,
             'filters' => $request->only(['tenant_id', 'date']),
         ]);
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'tenant_id' => ['required', 'exists:tenants,id'],
+            'type' => ['required', Rule::in(['in', 'out'])],
+            'timestamp' => ['nullable', 'date'],
+            'remarks' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $timestamp = $validated['timestamp']
+            ? Carbon::parse($validated['timestamp'])
+            : Carbon::now();
+
+        AttendanceLog::create([
+            'tenant_id' => $validated['tenant_id'],
+            'type' => $validated['type'],
+            'timestamp' => $timestamp,
+            'mode' => 'manual',
+            'device_id' => 'Manual Entry',
+            'ip' => $request->ip(),
+            'remarks' => $validated['remarks'] ?? null,
+        ]);
+
+        return redirect()
+            ->route('admin.attendance.index')
+            ->with('status', 'Attendance recorded successfully.');
     }
 }

@@ -39,7 +39,7 @@ class ReservationController extends Controller
     {
         $tenant = $request->user()->tenant()->with('reservations')->firstOrFail();
 
-        if ($tenant->admission_status !== $tenant::STATUS_APPROVED) {
+        if ($tenant->onboarding_status !== $tenant::STATUS_APPROVED) {
             return redirect()->back()->withErrors('You must be approved before reserving a room.');
         }
 

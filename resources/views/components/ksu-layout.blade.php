@@ -8,7 +8,7 @@
 
     $user = Auth::user();
     $tenant = $user?->tenant;
-    $tenantApproved = $tenant && $tenant->admission_status === \App\Models\Tenant::STATUS_APPROVED;
+    $tenantApproved = $tenant && $tenant->onboarding_status === \App\Models\Tenant::STATUS_APPROVED;
 
     $navItems = [];
 
@@ -37,11 +37,31 @@
                 ['label' => 'Status', 'href' => route('tenant.apply.status'), 'active' => request()->routeIs('tenant.apply.status')],
             ];
         }
+    } elseif ($user->isEmployee()) {
+        if ($tenantApproved) {
+            $navItems = [
+                ['label' => 'Dashboard', 'href' => route('employee.dashboard'), 'active' => request()->routeIs('employee.dashboard')],
+                ['label' => 'Status', 'href' => route('employee.status'), 'active' => request()->routeIs('employee.status')],
+                ['label' => 'Profile', 'href' => route('profile.edit'), 'active' => request()->routeIs('profile.edit')],
+            ];
+        } else {
+            $navItems = [
+                ['label' => 'Application', 'href' => route('employee.apply.form'), 'active' => request()->routeIs('employee.apply.form')],
+                ['label' => 'Status', 'href' => route('employee.status'), 'active' => request()->routeIs('employee.status')],
+                ['label' => 'Profile', 'href' => route('profile.edit'), 'active' => request()->routeIs('profile.edit')],
+            ];
+        }
+    } elseif ($user->isPresident()) {
+        $navItems = [
+            ['label' => 'Approvals', 'href' => route('president.approvals.employees.index'), 'active' => request()->routeIs('president.approvals.employees.*')],
+            ['label' => 'Profile', 'href' => route('profile.edit'), 'active' => request()->routeIs('profile.edit')],
+        ];
     } elseif (in_array($user->role, ['dorm_master', 'student_director'])) {
         $navItems = [
             ['label' => 'Dashboard', 'href' => route('admin.dashboard'), 'active' => request()->routeIs('admin.dashboard')],
             ['label' => 'Rooms', 'href' => route('admin.rooms.index'), 'active' => request()->routeIs('admin.rooms.*')],
             ['label' => 'Reservations', 'href' => route('admin.reservations.index'), 'active' => request()->routeIs('admin.reservations.*')],
+            ['label' => 'Interview Slots', 'href' => route('admin.interview-slots.index'), 'active' => request()->routeIs('admin.interview-slots.*')],
             ['label' => 'Interviews', 'href' => route('admin.interviews.index'), 'active' => request()->routeIs('admin.interviews.*')],
             ['label' => 'Attendance', 'href' => route('admin.attendance.index'), 'active' => request()->routeIs('admin.attendance.*')],
         ];
@@ -224,6 +244,7 @@
         </div>
     </body>
 </html>
+
 
 
 
