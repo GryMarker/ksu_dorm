@@ -7,10 +7,14 @@ use App\Http\Controllers\Admin\InterviewSlotController as AdminInterviewSlotCont
 use App\Http\Controllers\Admin\ReservationDecisionController;
 use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Admin\EmployeeCottageController as AdminEmployeeCottageController;
 use App\Http\Controllers\Employee\EmployeeApplyController;
 use App\Http\Controllers\Employee\EmployeeDashboardController;
+use App\Http\Controllers\Employee\EmployeeCottageController;
+use App\Http\Controllers\Employee\EmployeePaymentController;
 use App\Http\Controllers\Employee\EmployeeStatusController;
 use App\Http\Controllers\President\EmployeeApprovalController;
+use App\Http\Controllers\President\EmployeePaymentApprovalController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Public\HomeController;
 use App\Http\Controllers\Tenant\ApplyController;
@@ -57,14 +61,28 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/attendance', [TenantAttendanceController::class, 'index'])->name('tenant.attendance.index');
     });
 
-    Route::prefix('employee')->middleware(['verified', 'role:employee', 'employee.approved'])->group(function () {
+    Route::prefix('employee')->middleware(['role:employee', 'employee.approved'])->group(function () {
         Route::get('/dashboard', [EmployeeDashboardController::class, 'index'])->name('employee.dashboard');
+        Route::get('/payments', [EmployeePaymentController::class, 'index'])->name('employee.payments.index');
+        Route::post('/payments', [EmployeePaymentController::class, 'store'])->name('employee.payments.store');
+        Route::get('/cottages', [EmployeeCottageController::class, 'index'])->name('employee.cottages.index');
+        Route::post('/cottages/{cottage}/request', [EmployeeCottageController::class, 'request'])->name('employee.cottages.request');
     });
 
     Route::prefix('president')->middleware('role:president')->group(function () {
         Route::get('/approvals/employees', [EmployeeApprovalController::class, 'index'])->name('president.approvals.employees.index');
         Route::patch('/approvals/employees/{tenant}/approve', [EmployeeApprovalController::class, 'approve'])->name('president.approvals.employees.approve');
         Route::patch('/approvals/employees/{tenant}/reject', [EmployeeApprovalController::class, 'reject'])->name('president.approvals.employees.reject');
+        Route::get('/payments', [EmployeePaymentApprovalController::class, 'index'])->name('president.payments.index');
+        Route::patch('/payments/{payment}/approve', [EmployeePaymentApprovalController::class, 'approve'])->name('president.payments.approve');
+        Route::patch('/payments/{payment}/reject', [EmployeePaymentApprovalController::class, 'reject'])->name('president.payments.reject');
+    });
+
+    Route::prefix('management')->middleware('role:dorm_master,president')->group(function () {
+        Route::get('/cottages', [AdminEmployeeCottageController::class, 'index'])->name('management.cottages.index');
+        Route::patch('/cottages/{cottage}/approve', [AdminEmployeeCottageController::class, 'approve'])->name('management.cottages.approve');
+        Route::patch('/cottages/{cottage}/reject', [AdminEmployeeCottageController::class, 'reject'])->name('management.cottages.reject');
+        Route::patch('/cottages/{cottage}/release', [AdminEmployeeCottageController::class, 'release'])->name('management.cottages.release');
     });
 
     Route::middleware('can:viewAny,App\\Models\\Room')->group(function () {

@@ -2,6 +2,8 @@
     use App\Models\Tenant as TenantModel;
 
     $status = $tenant->onboarding_status ?? TenantModel::STATUS_DRAFT;
+    $displayRate = number_format($tenant->monthly_rate ?? TenantModel::DEFAULT_EMPLOYEE_MONTHLY_RATE, 2);
+    $familyMembersValue = implode("\n", (array) $tenant->family_members);
 @endphp
 
 <x-ksu-layout page-title="Employee Onboarding">
@@ -85,35 +87,47 @@
                                 <x-text-input id="place_of_birth" name="place_of_birth" type="text" class="mt-1 block w-full" :value="old('place_of_birth', $tenant->place_of_birth)" required />
                                 <x-input-error :messages="$errors->get('place_of_birth')" />
                             </div>
-                            <div class="space-y-2">
-                                <x-input-label for="father_name" value="Father's Name" />
-                                <x-text-input id="father_name" name="father_name" type="text" class="mt-1 block w-full" :value="old('father_name', $tenant->father_name)" required />
-                                <x-input-error :messages="$errors->get('father_name')" />
-                            </div>
-                            <div class="space-y-2">
-                                <x-input-label for="father_contact" value="Father's Contact" />
-                                <x-text-input id="father_contact" name="father_contact" type="text" class="mt-1 block w-full" :value="old('father_contact', $tenant->father_contact)" required />
-                                <x-input-error :messages="$errors->get('father_contact')" />
-                            </div>
-                            <div class="space-y-2">
-                                <x-input-label for="mother_name" value="Mother's Name" />
-                                <x-text-input id="mother_name" name="mother_name" type="text" class="mt-1 block w-full" :value="old('mother_name', $tenant->mother_name)" required />
-                                <x-input-error :messages="$errors->get('mother_name')" />
-                            </div>
-                            <div class="space-y-2">
-                                <x-input-label for="mother_contact" value="Mother's Contact" />
-                                <x-text-input id="mother_contact" name="mother_contact" type="text" class="mt-1 block w-full" :value="old('mother_contact', $tenant->mother_contact)" required />
-                                <x-input-error :messages="$errors->get('mother_contact')" />
-                            </div>
-                            <div class="space-y-2">
-                                <x-input-label for="course_year" value="Course / Department" />
-                                <x-text-input id="course_year" name="course_year" type="text" class="mt-1 block w-full" :value="old('course_year', $tenant->course_year)" required />
-                                <x-input-error :messages="$errors->get('course_year')" />
+                            <div class="space-y-2 md:col-span-2">
+                                <x-input-label for="department" value="Department" />
+                                <x-text-input id="department" name="department" type="text" class="mt-1 block w-full" :value="old('department', $tenant->course_year)" required />
+                                <x-input-error :messages="$errors->get('department')" />
                             </div>
                             <div class="space-y-2">
                                 <x-input-label for="cellphone" value="Mobile Number" />
                                 <x-text-input id="cellphone" name="cellphone" type="text" class="mt-1 block w-full" :value="old('cellphone', $tenant->cellphone)" required />
                                 <x-input-error :messages="$errors->get('cellphone')" />
+                            </div>
+                            <div class="space-y-2">
+                                <x-input-label value="Monthly Housing Rate" />
+                                <div class="mt-1 flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-ksu-900">
+                                    <span class="mr-1 text-slate-500">&#8369;</span>
+                                    <span>{{ $displayRate }}</span>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <x-input-label for="salary_deduction" value="Salary Deduction" />
+                                <label class="mt-1 flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700">
+                                    <input
+                                        id="salary_deduction"
+                                        name="salary_deduction"
+                                        type="checkbox"
+                                        value="1"
+                                        @checked(old('salary_deduction', $tenant->salary_deduction))
+                                        class="h-4 w-4 rounded border-slate-300 text-ksu-600 focus:ring-ksu-500"
+                                    >
+                                    <span>Deduct from salary payroll</span>
+                                </label>
+                                <x-input-error :messages="$errors->get('salary_deduction')" />
+                            </div>
+                            <div class="space-y-2 md:col-span-2">
+                                <x-input-label for="family_members" value="Family Members (one name per line)" />
+                                <textarea
+                                    id="family_members"
+                                    name="family_members"
+                                    rows="4"
+                                    class="mt-1 block w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-ksu-600 focus:outline-none focus:ring-ksu-400"
+                                >{{ old('family_members', $familyMembersValue) }}</textarea>
+                                <x-input-error :messages="$errors->get('family_members')" />
                             </div>
                         </div>
 
@@ -141,7 +155,7 @@
                             <ul class="mt-3 space-y-2">
                                 <li>Submit your personal profile for administrative records.</li>
                                 <li>Your request will be routed to the University President for approval.</li>
-                                <li>You'll receive an email once your access is granted.</li>
+                                <li>Status updates are reflected here once a decision is made.</li>
                             </ul>
                         </div>
                         <div class="rounded-xl border border-slate-200 bg-white p-4">

@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\Assignment;
 use App\Models\AttendanceLog;
+use App\Models\EmployeeCottage;
+use App\Models\EmployeePayment;
 use App\Models\Bed;
 use App\Models\InterviewSlot;
 use App\Models\Reservation;
@@ -34,13 +36,6 @@ class DevSeeder extends Seeder
             'password' => Hash::make('password'),
         ]);
 
-        User::factory()->create([
-            'name' => 'University President',
-            'email' => 'president@ksu.test',
-            'role' => User::ROLE_PRESIDENT,
-            'password' => Hash::make('password'),
-        ]);
-
         $employeeUser = User::factory()->create([
             'name' => 'Sample Employee',
             'email' => 'employee@ksu.test',
@@ -48,7 +43,7 @@ class DevSeeder extends Seeder
             'password' => Hash::make('password'),
         ]);
 
-        $employeeUser->tenant()->create([
+        $employeeTenant = $employeeUser->tenant()->create([
             'full_name' => 'Sample Employee',
             'nickname' => 'Emp',
             'gender' => Tenant::GENDER_MALE,
@@ -65,6 +60,9 @@ class DevSeeder extends Seeder
             'policy_accepted_at' => Carbon::now()->subDay(),
             'type' => Tenant::TYPE_EMPLOYEE,
             'employee_id_number' => 'EMP-1001',
+            'monthly_rate' => Tenant::DEFAULT_EMPLOYEE_MONTHLY_RATE,
+            'salary_deduction' => true,
+            'family_members' => ['Alex Employee', 'Casey Employee'],
             'university_id_no' => 'EMP-' . Str::upper(Str::random(6)),
             'program' => null,
             'year_level' => null,
@@ -72,8 +70,40 @@ class DevSeeder extends Seeder
             'emergency_contact_name' => 'Employee Emergency',
             'emergency_contact_phone' => '0918-555-4444',
             'medical_notes' => null,
-            'onboarding_status' => Tenant::STATUS_FOR_APPROVAL,
+            'onboarding_status' => Tenant::STATUS_APPROVED,
             'admission_form_json' => ['reason' => 'Access dorm systems'],
+        ]);
+
+        $cottage = EmployeeCottage::available()->orderBy('code')->first();
+        if ($cottage) {
+            $cottage->forceFill([
+                'tenant_id' => $employeeTenant->id,
+                'requested_tenant_id' => null,
+                'requested_at' => null,
+                'status' => EmployeeCottage::STATUS_OCCUPIED,
+                'family_members' => ['Alex Employee', 'Casey Employee'],
+            ])->save();
+        }
+
+        $president = User::where('role', User::ROLE_PRESIDENT)->first();
+
+        $employeeTenant->employeePayments()->create([
+            'billing_month' => Carbon::now()->startOfMonth(),
+            'amount' => Tenant::DEFAULT_EMPLOYEE_MONTHLY_RATE,
+            'salary_deduction' => true,
+            'status' => EmployeePayment::STATUS_PENDING,
+            'employee_note' => 'Awaiting payroll deduction confirmation.',
+        ]);
+
+        $employeeTenant->employeePayments()->create([
+            'billing_month' => Carbon::now()->subMonth()->startOfMonth(),
+            'amount' => Tenant::DEFAULT_EMPLOYEE_MONTHLY_RATE,
+            'salary_deduction' => true,
+            'status' => EmployeePayment::STATUS_APPROVED,
+            'employee_note' => 'Payroll deduction processed.',
+            'review_note' => 'Approved for payroll processing.',
+            'reviewed_by' => $president?->id,
+            'reviewed_at' => Carbon::now()->subDays(5),
         ]);
 
         $rooms = collect([

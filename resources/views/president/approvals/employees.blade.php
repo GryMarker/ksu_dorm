@@ -1,3 +1,7 @@
+@php
+    use App\Models\Tenant;
+@endphp
+
 <x-ksu-layout page-title="Employee Approvals">
     <div class="space-y-8">
         <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -24,7 +28,8 @@
                         <thead class="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500">
                             <tr>
                                 <th scope="col" class="px-4 py-3">Employee</th>
-                                <th scope="col" class="px-4 py-3">Department / Course</th>
+                                <th scope="col" class="px-4 py-3">Department</th>
+                                <th scope="col" class="px-4 py-3">Rate / Deduction</th>
                                 <th scope="col" class="px-4 py-3">Submitted</th>
                                 <th scope="col" class="px-4 py-3">Actions</th>
                             </tr>
@@ -42,7 +47,13 @@
                                         </div>
                                     </td>
                                     <td class="px-4 py-4 text-sm text-slate-600">
-                                        {{ $tenant->course_year ?: '—' }}
+                                        {{ $tenant->course_year ?: 'Pending' }}
+                                    </td>
+                                    <td class="px-4 py-4 text-sm text-slate-600">
+                                        <div class="space-y-1">
+                                            <p class="font-semibold text-ksu-900">&#8369; {{ number_format($tenant->monthly_rate ?? Tenant::DEFAULT_EMPLOYEE_MONTHLY_RATE, 2) }}</p>
+                                            <p class="text-xs text-slate-500">{{ $tenant->salary_deduction ? 'Salary deduction' : 'Direct payment' }}</p>
+                                        </div>
                                     </td>
                                     <td class="px-4 py-4 text-sm text-slate-600">
                                         {{ $tenant->updated_at->diffForHumans() }}

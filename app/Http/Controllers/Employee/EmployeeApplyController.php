@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Employee;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\TenantApplyRequest;
+use App\Http\Requests\EmployeeApplyRequest;
 use App\Models\Tenant;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -23,7 +23,7 @@ class EmployeeApplyController extends Controller
         ]);
     }
 
-    public function submit(TenantApplyRequest $request): RedirectResponse
+    public function submit(EmployeeApplyRequest $request): RedirectResponse
     {
         $tenant = $request->user()->tenant()->firstOrFail();
 
@@ -39,14 +39,25 @@ class EmployeeApplyController extends Controller
             'home_address' => $data['home_address'],
             'age' => $data['age'],
             'place_of_birth' => $data['place_of_birth'],
-            'father_name' => $data['father_name'],
-            'father_contact' => $data['father_contact'],
-            'mother_name' => $data['mother_name'],
-            'mother_contact' => $data['mother_contact'],
-            'course_year' => $data['course_year'],
+            'course_year' => $data['department'],
             'cellphone' => $data['cellphone'],
             'phone' => $data['cellphone'],
+            'father_name' => null,
+            'father_contact' => null,
+            'mother_name' => null,
+            'mother_contact' => null,
         ]);
+
+        $tenant->monthly_rate = $tenant->monthly_rate ?? Tenant::DEFAULT_EMPLOYEE_MONTHLY_RATE;
+        $tenant->salary_deduction = $request->boolean('salary_deduction');
+
+        $familyMembers = collect(preg_split('/\r\n|\r|\n/', (string) ($data['family_members'] ?? '')))
+            ->map(static fn ($member) => trim($member))
+            ->filter()
+            ->values()
+            ->all();
+
+        $tenant->family_members = ! empty($familyMembers) ? $familyMembers : null;
 
         $tenant->policy_accepted_at = Carbon::now();
 
@@ -55,6 +66,15 @@ class EmployeeApplyController extends Controller
         }
 
         $tenant->save();
+        $tenant->load('cottage', 'cottageRequest');
+
+        foreach ([$tenant->cottage, $tenant->cottageRequest] as $cottage) {
+            if ($cottage) {
+                $cottage->forceFill([
+                    'family_members' => $tenant->family_members ?: [],
+                ])->save();
+            }
+        }
 
         $user = $request->user();
         if ($user->name !== $data['full_name']) {

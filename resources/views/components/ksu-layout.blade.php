@@ -41,6 +41,8 @@
         if ($tenantApproved) {
             $navItems = [
                 ['label' => 'Dashboard', 'href' => route('employee.dashboard'), 'active' => request()->routeIs('employee.dashboard')],
+                ['label' => 'Cottages', 'href' => route('employee.cottages.index'), 'active' => request()->routeIs('employee.cottages.*')],
+                ['label' => 'Payments', 'href' => route('employee.payments.index'), 'active' => request()->routeIs('employee.payments.*')],
                 ['label' => 'Status', 'href' => route('employee.status'), 'active' => request()->routeIs('employee.status')],
                 ['label' => 'Profile', 'href' => route('profile.edit'), 'active' => request()->routeIs('profile.edit')],
             ];
@@ -53,7 +55,9 @@
         }
     } elseif ($user->isPresident()) {
         $navItems = [
-            ['label' => 'Approvals', 'href' => route('president.approvals.employees.index'), 'active' => request()->routeIs('president.approvals.employees.*')],
+            ['label' => 'Onboarding', 'href' => route('president.approvals.employees.index'), 'active' => request()->routeIs('president.approvals.employees.*')],
+            ['label' => 'Payments', 'href' => route('president.payments.index'), 'active' => request()->routeIs('president.payments.*')],
+            ['label' => 'Cottages', 'href' => route('management.cottages.index'), 'active' => request()->routeIs('management.cottages.*')],
             ['label' => 'Profile', 'href' => route('profile.edit'), 'active' => request()->routeIs('profile.edit')],
         ];
     } elseif (in_array($user->role, ['dorm_master', 'student_director'])) {
@@ -64,6 +68,7 @@
             ['label' => 'Interview Slots', 'href' => route('admin.interview-slots.index'), 'active' => request()->routeIs('admin.interview-slots.*')],
             ['label' => 'Interviews', 'href' => route('admin.interviews.index'), 'active' => request()->routeIs('admin.interviews.*')],
             ['label' => 'Attendance', 'href' => route('admin.attendance.index'), 'active' => request()->routeIs('admin.attendance.*')],
+            ['label' => 'Employee Cottages', 'href' => route('management.cottages.index'), 'active' => request()->routeIs('management.cottages.*')],
         ];
     } else {
         $navItems = [

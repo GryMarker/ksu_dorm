@@ -2,14 +2,22 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        $shouldSeedDev = ! User::query()->exists();
+
         $this->call([
-            DevSeeder::class,
+            EmployeeCottageSeeder::class,
+            PresidentSeeder::class,
         ]);
+
+        if ($shouldSeedDev && app()->environment(['local', 'testing'])) {
+            $this->call(DevSeeder::class);
+        }
     }
 }

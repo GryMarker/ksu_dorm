@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\President;
 
 use App\Http\Controllers\Controller;
+use App\Models\EmployeeCottage;
 use App\Models\Tenant;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -42,6 +43,9 @@ class EmployeeApprovalController extends Controller
             'onboarding_status' => Tenant::STATUS_APPROVED,
         ])->save();
 
+        $tenant->monthly_rate ??= Tenant::DEFAULT_EMPLOYEE_MONTHLY_RATE;
+        $tenant->save();
+
         return redirect()
             ->route('president.approvals.employees.index')
             ->with('status', "{$tenant->full_name} has been approved.");
@@ -54,6 +58,18 @@ class EmployeeApprovalController extends Controller
         $tenant->forceFill([
             'onboarding_status' => Tenant::STATUS_REJECTED,
         ])->save();
+
+        $cottage = $tenant->cottage;
+
+        if ($cottage) {
+            $cottage->forceFill([
+                'tenant_id' => null,
+                'requested_tenant_id' => null,
+                'requested_at' => null,
+                'status' => EmployeeCottage::STATUS_AVAILABLE,
+                'family_members' => null,
+            ])->save();
+        }
 
         return redirect()
             ->route('president.approvals.employees.index')

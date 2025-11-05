@@ -25,6 +25,8 @@ class Tenant extends Model
     public const GENDER_MALE = 'male';
     public const GENDER_FEMALE = 'female';
 
+    public const DEFAULT_EMPLOYEE_MONTHLY_RATE = 1800.00;
+
     protected $fillable = [
         'user_id',
         'full_name',
@@ -43,6 +45,9 @@ class Tenant extends Model
         'policy_accepted_at',
         'type',
         'employee_id_number',
+        'monthly_rate',
+        'salary_deduction',
+        'family_members',
         'onboarding_status',
         'university_id_no',
         'program',
@@ -60,6 +65,9 @@ class Tenant extends Model
             'admission_form_json' => 'array',
             'dob' => 'date',
             'policy_accepted_at' => 'datetime',
+            'family_members' => 'array',
+            'salary_deduction' => 'boolean',
+            'monthly_rate' => 'decimal:2',
         ];
     }
 
@@ -83,6 +91,11 @@ class Tenant extends Model
         return $this->hasMany(AttendanceLog::class);
     }
 
+    public function employeePayments(): HasMany
+    {
+        return $this->hasMany(EmployeePayment::class);
+    }
+
     public function interviews(): HasMany
     {
         return $this->hasMany(Interview::class);
@@ -91,5 +104,15 @@ class Tenant extends Model
     public function activeAssignment(): HasOne
     {
         return $this->hasOne(Assignment::class)->where('is_active', true)->latestOfMany('start_date');
+    }
+
+    public function cottage(): HasOne
+    {
+        return $this->hasOne(EmployeeCottage::class, 'tenant_id');
+    }
+
+    public function cottageRequest(): HasOne
+    {
+        return $this->hasOne(EmployeeCottage::class, 'requested_tenant_id');
     }
 }

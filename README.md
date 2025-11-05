@@ -1,6 +1,6 @@
 # KSU Dorm Management System (MVP)
 
-Laravel 11 application that manages admission, interview scheduling, room assignments, transfers, reservations, and attendance logging for Kalinga State University dormitories. The project ships with Laravel Breeze authentication (email verification enabled), role-based authorization via policies, queue-ready notification mailables, and seed data for quick demos.
+Laravel 11 application that manages admission, interview scheduling, room assignments, transfers, reservations, and attendance logging for Kalinga State University dormitories. The project ships with Laravel Breeze authentication (single sign-on without email verification), role-based authorization via policies, employee cottage management, and seed data for quick demos.
 
 ## Tech Stack
 - Laravel 11 (PHP 8.2+)
@@ -37,15 +37,17 @@ Laravel 11 application that manages admission, interview scheduling, room assign
    ```
 
 ## Default Accounts
-| Role                          | Email                       | Password |
-| ----------------------------- | --------------------------- | -------- |
-| Dorm Master                   | dormmaster@ksu.test         | password |
-| Student Director              | director@ksu.test           | password |
-| Draft Applicant (Tenant)      | applicant@ksu.test          | password |
-| Approved Tenant Samples       | tenant1@ksu.test ... tenant5@ksu.test | password |
-| Interview-Pending Tenants     | tenant6@ksu.test ... tenant9@ksu.test | password |
+| Role                          | Email                                     | Password |
+| ----------------------------- | ----------------------------------------- | -------- |
+| Dorm Master                   | dormmaster@ksu.test                       | password |
+| Student Director              | director@ksu.test                         | password |
+| University President          | president@ksu.test                        | password |
+| Sample Employee (approved)    | employee@ksu.test                         | password |
+| Draft Applicant (Tenant)      | applicant@ksu.test                        | password |
+| Approved Tenant Samples       | tenant1@ksu.test ... tenant5@ksu.test     | password |
+| Interview-Pending Tenants     | tenant6@ksu.test ... tenant9@ksu.test     | password |
 
-> New registrations default to the `tenant` role and must verify email. Tenants are blocked from the tenant dashboard until they complete the onboarding funnel described below.
+> New registrations share the same form: applicants choose Student or Employee. Students follow the onboarding funnel below, while employee access remains limited until the University President approves their profile.
 
 ## Tenant Onboarding Flow
 1. **Submit the application form** - all profile fields are required together with the policies/terms acknowledgement.
@@ -64,6 +66,11 @@ Laravel 11 application that manages admission, interview scheduling, room assign
   - **Student Director**: read-only dashboards and listings.
   - **Tenant**: onboarding funnel, availability lookup, reservation/transfer requests, attendance history, "My Room" view.
 - Notification logging via `notification_logs` for every email that is queued.
+- Employee cottage tracking with availability requests, Dorm Master / President approvals, and family roster records.
+- Monthly employee housing payments recorded as "pending" until the President approves or rejects each entry.
+
+## Automation
+- `php artisan payments:generate` — creates pending payment records for every approved employee for the supplied month (defaults to the current month). This command is scheduled automatically via `routes/console.php` to run on the 1st of each month (`Schedule::command('payments:generate')->monthlyOn(1, '00:10')`).
 
 ## API
 - `POST /api/attendance/scan`
