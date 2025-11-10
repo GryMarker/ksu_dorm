@@ -16,14 +16,30 @@ return new class extends Migration
                 ->after('admission_status');
         });
 
-        DB::statement("ALTER TABLE tenants MODIFY type ENUM('student','employee') NOT NULL DEFAULT 'student'");
+        $driver = Schema::getConnection()->getDriverName();
+
+        if ($driver === 'mysql') {
+            DB::statement("ALTER TABLE tenants MODIFY type ENUM('student','employee') NOT NULL DEFAULT 'student'");
+        } elseif ($driver === 'pgsql') {
+            DB::statement("ALTER TABLE tenants ALTER COLUMN type SET DEFAULT 'student'");
+            DB::statement("ALTER TABLE tenants ALTER COLUMN type SET NOT NULL");
+        }
+
         DB::statement("UPDATE tenants SET onboarding_status = admission_status");
     }
 
     public function down(): void
     {
-        DB::statement("ALTER TABLE tenants MODIFY type ENUM('student','employee') NOT NULL");
-        DB::statement("ALTER TABLE tenants DROP COLUMN onboarding_status");
-        DB::statement("ALTER TABLE tenants DROP COLUMN employee_id_number");
+        $driver = Schema::getConnection()->getDriverName();
+
+        if ($driver === 'mysql') {
+            DB::statement("ALTER TABLE tenants MODIFY type ENUM('student','employee') NOT NULL");
+        } elseif ($driver === 'pgsql') {
+            DB::statement("ALTER TABLE tenants ALTER COLUMN type DROP DEFAULT");
+        }
+
+        Schema::table('tenants', function (Blueprint $table) {
+            $table->dropColumn(['onboarding_status', 'employee_id_number']);
+        });
     }
 };

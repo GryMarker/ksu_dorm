@@ -15,7 +15,15 @@ return new class extends Migration
             $table->json('family_members')->nullable()->after('requested_at');
         });
 
-        DB::statement("ALTER TABLE employee_cottages MODIFY status ENUM('available','requested','occupied','maintenance') NOT NULL DEFAULT 'available'");
+        $driver = Schema::getConnection()->getDriverName();
+
+        if ($driver === 'mysql') {
+            DB::statement("ALTER TABLE employee_cottages MODIFY status ENUM('available','requested','occupied','maintenance') NOT NULL DEFAULT 'available'");
+        } elseif ($driver === 'pgsql') {
+            DB::statement('ALTER TABLE employee_cottages DROP CONSTRAINT IF EXISTS employee_cottages_status_check');
+            DB::statement("ALTER TABLE employee_cottages ADD CONSTRAINT employee_cottages_status_check CHECK (status IN ('available','requested','occupied','maintenance'))");
+            DB::statement("ALTER TABLE employee_cottages ALTER COLUMN status SET DEFAULT 'available'");
+        }
     }
 
     public function down(): void
@@ -25,6 +33,14 @@ return new class extends Migration
             $table->dropColumn(['requested_at', 'family_members']);
         });
 
-        DB::statement("ALTER TABLE employee_cottages MODIFY status ENUM('available','occupied','maintenance') NOT NULL DEFAULT 'available'");
+        $driver = Schema::getConnection()->getDriverName();
+
+        if ($driver === 'mysql') {
+            DB::statement("ALTER TABLE employee_cottages MODIFY status ENUM('available','occupied','maintenance') NOT NULL DEFAULT 'available'");
+        } elseif ($driver === 'pgsql') {
+            DB::statement('ALTER TABLE employee_cottages DROP CONSTRAINT IF EXISTS employee_cottages_status_check');
+            DB::statement("ALTER TABLE employee_cottages ADD CONSTRAINT employee_cottages_status_check CHECK (status IN ('available','occupied','maintenance'))");
+            DB::statement("ALTER TABLE employee_cottages ALTER COLUMN status SET DEFAULT 'available'");
+        }
     }
 };
