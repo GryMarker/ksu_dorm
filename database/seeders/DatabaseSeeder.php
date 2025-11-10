@@ -14,9 +14,10 @@ class DatabaseSeeder extends Seeder
         $this->call([
             EmployeeCottageSeeder::class,
             PresidentSeeder::class,
+            DevSeeder::class,
         ]);
 
-        if ($shouldSeedDev && app()->environment(['local', 'testing'])) {
+        if ($shouldSeedDev && app()->environment(['local', 'testing', ])) {
             $this->call(DevSeeder::class);
         }
     }
