@@ -19,10 +19,11 @@ class InterviewController extends Controller
         $currentInterview = $tenant->interviews()->whereNull('result')->latest('scheduled_at')->first();
 
         $slots = InterviewSlot::open()
-            ->where('starts_at', '>=', now())
             ->withCount('interviews')
             ->orderBy('starts_at')
             ->get()
+            ->filter(fn (InterviewSlot $slot) => $slot->starts_at?->greaterThanOrEqualTo(now()))
+            ->values()
             ->map(function (InterviewSlot $slot) use ($currentInterview) {
                 $bookedCount = $slot->interviews_count;
 

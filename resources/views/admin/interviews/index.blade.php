@@ -12,12 +12,12 @@
                 <x-ksu-table :headers="['Tenant', 'Schedule', 'Result', 'Notes', 'Action']">
                     @foreach ($interviews as $interview)
                         @php
-                            $badgeVariant = match ($interview->result) {
+                            $badgeVariantMap = [
                                 'approved' => 'approved',
                                 'rejected' => 'rejected',
                                 'recheck' => 'pending',
-                                default => 'info',
-                            };
+                            ];
+                            $badgeVariant = $badgeVariantMap[$interview->result] ?? 'info';
                         @endphp
                         <tr>
                             <td class="px-5 py-4 text-sm text-ksu-900">
@@ -33,7 +33,7 @@
                                 </x-ksu-badge>
                             </td>
                             <td class="px-5 py-4 text-sm text-slate-600">
-                                {{ $interview->notes ?? '—' }}
+                                {{ $interview->notes ?? 'No notes yet' }}
                             </td>
                             <td class="px-5 py-4">
                                 <form method="POST" action="{{ route('admin.interviews.result', $interview) }}" class="space-y-2 rounded-2xl border border-slate-200/70 bg-white/80 p-4 shadow-sm">
@@ -79,3 +79,6 @@
         </x-ksu-card>
     </div>
 </x-ksu-layout>
+
+
+
