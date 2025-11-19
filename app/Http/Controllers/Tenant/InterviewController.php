@@ -15,15 +15,19 @@ class InterviewController extends Controller
 {
     public function listOpenSlots(Request $request): View
     {
-        $tenant = $request->user()->tenant()->with(['interviews.slot' => fn ($query) => $query->orderBy('starts_at')])->firstOrFail();
-        $currentInterview = $tenant->interviews()->whereNull('result')->latest('scheduled_at')->first();
+        $tenant = $request->user()->tenant()->firstOrFail();
+        $currentInterview = $tenant->interviews()
+            ->whereNull('result')
+            ->latest('scheduled_at')
+            ->with('slot')
+            ->first();
+        $now = now();
 
         $slots = InterviewSlot::open()
+            ->where('starts_at', '>=', $now)
             ->withCount('interviews')
             ->orderBy('starts_at')
             ->get()
-            ->filter(fn (InterviewSlot $slot) => $slot->starts_at?->greaterThanOrEqualTo(now()))
-            ->values()
             ->map(function (InterviewSlot $slot) use ($currentInterview) {
                 $bookedCount = $slot->interviews_count;
 
@@ -51,7 +55,10 @@ class InterviewController extends Controller
             return redirect()->route('tenant.apply.slots')->withErrors('This slot is no longer available.');
         }
 
-        $currentInterview = $tenant->interviews()->whereNull('result')->latest('scheduled_at')->first();
+        $currentInterview = $tenant->interviews()
+            ->whereNull('result')
+            ->latest('scheduled_at')
+            ->first();
         $bookedCount = $slot->interviews()->count();
 
         $isSameSlot = $currentInterview && $currentInterview->slot_id === $slot->id;
@@ -77,9 +84,11 @@ class InterviewController extends Controller
             $tenant->save();
         }
 
+        $currentInterview->setRelation('slot', $slot);
+
         NotificationService::queueMail(
             $tenant->user,
-            new InterviewScheduledMail($tenant, $currentInterview->fresh('slot')),
+            new InterviewScheduledMail($tenant, $currentInterview),
             'interview.scheduled',
             [
                 'tenant_id' => $tenant->id,

@@ -16,8 +16,6 @@
         $navItems = [
             ['label' => 'Home', 'href' => route('home'), 'active' => request()->routeIs('home')],
             ['label' => 'Apply', 'href' => route('tenant.apply.form'), 'active' => request()->routeIs('tenant.apply.*')],
-            ['label' => 'Login', 'href' => route('login'), 'active' => request()->routeIs('login')],
-            ['label' => 'Student Register', 'href' => route('register'), 'active' => request()->routeIs('register')],
             ['label' => 'Admin Login', 'href' => url('/login?guard=admin'), 'active' => false],
         ];
     } elseif ($user->isTenant()) {
@@ -124,10 +122,10 @@
                         <div class="hidden lg:flex items-center gap-3">
                             @guest
                                 <a href="{{ route('register') }}">
-                                    <x-ksu-button variant="outline" size="sm">Student Register</x-ksu-button>
+                                    <x-ksu-button variant="outline" size="sm">Student/Employee Register</x-ksu-button>
                                 </a>
                                 <a href="{{ route('login') }}">
-                                    <x-ksu-button size="sm">Login</x-ksu-button>
+                                    <x-ksu-button size="sm">Student/Employee Login</x-ksu-button>
                                 </a>
                             @else
                                 <span class="hidden text-sm font-medium text-ksu-800 xl:block">
@@ -183,10 +181,10 @@
                         <div class="mt-4 flex flex-col gap-3">
                             @guest
                                 <a href="{{ route('register') }}">
-                                    <x-ksu-button variant="outline" full>Student Register</x-ksu-button>
+                                    <x-ksu-button variant="outline" full>Student/Employee Register</x-ksu-button>
                                 </a>
                                 <a href="{{ route('login') }}">
-                                    <x-ksu-button full>Login</x-ksu-button>
+                                    <x-ksu-button full>Student/Employee Login</x-ksu-button>
                                 </a>
                             @else
                                 <a href="{{ route('profile.edit') }}" @click="mobileOpen = false">
@@ -207,7 +205,14 @@
             @if($toastMessages->isNotEmpty())
                 <div class="pointer-events-none fixed top-6 right-6 z-50 flex w-full max-w-sm flex-col gap-3">
                     @foreach($toastMessages as $toast)
-                        <div class="pointer-events-auto rounded-2xl border border-ksu-600/20 bg-white p-4 shadow-ksu {{ $toast['type'] === 'error' ? 'border-crimson/30' : '' }}">
+                        <div
+                            x-data="{ visible: true }"
+                            x-init="setTimeout(() => visible = false, 5000)"
+                            x-show="visible"
+                            x-transition.opacity.duration.300ms
+                            x-cloak
+                            class="pointer-events-auto rounded-2xl border border-ksu-600/20 bg-white p-4 shadow-ksu {{ $toast['type'] === 'error' ? 'border-crimson/30' : '' }}"
+                        >
                             <div class="flex items-start gap-3">
                                 <span class="mt-1 flex h-8 w-8 items-center justify-center rounded-full {{ $toast['type'] === 'error' ? 'bg-crimson/10 text-crimson' : 'bg-ksu-600/10 text-ksu-700' }}">
                                     @if($toast['type'] === 'error')

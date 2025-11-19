@@ -3,7 +3,11 @@
         method="POST"
         action="{{ route('register') }}"
         class="space-y-6"
-        x-data="{ userType: @js(old('user_type', 'student')) }"
+        x-data="{
+            userType: @js(old('user_type', 'student')),
+            showPassword: false,
+            showPasswordConfirmation: false,
+        }"
     >
         @csrf
 
@@ -48,13 +52,49 @@
 
         <div class="space-y-2">
             <x-input-label for="password" :value="__('Password')" />
-            <x-text-input id="password" name="password" type="password" required autocomplete="new-password" />
+            <div class="relative">
+                <x-text-input
+                    id="password"
+                    name="password"
+                    type="password"
+                    x-bind:type="showPassword ? 'text' : 'password'"
+                    required
+                    autocomplete="new-password"
+                    class="block w-full pr-12"
+                />
+                <button
+                    type="button"
+                    @click="showPassword = !showPassword"
+                    class="absolute inset-y-0 right-3 text-sm font-semibold text-ksu-600 transition hover:text-ksu-500 focus:outline-none"
+                    :aria-pressed="showPassword"
+                >
+                    <span x-text="showPassword ? 'Hide' : 'Show'">Show</span>
+                </button>
+            </div>
             <x-input-error :messages="$errors->get('password')" />
         </div>
 
         <div class="space-y-2">
             <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-            <x-text-input id="password_confirmation" name="password_confirmation" type="password" required autocomplete="new-password" />
+            <div class="relative">
+                <x-text-input
+                    id="password_confirmation"
+                    name="password_confirmation"
+                    type="password"
+                    x-bind:type="showPasswordConfirmation ? 'text' : 'password'"
+                    required
+                    autocomplete="new-password"
+                    class="block w-full pr-12"
+                />
+                <button
+                    type="button"
+                    @click="showPasswordConfirmation = !showPasswordConfirmation"
+                    class="absolute inset-y-0 right-3 text-sm font-semibold text-ksu-600 transition hover:text-ksu-500 focus:outline-none"
+                    :aria-pressed="showPasswordConfirmation"
+                >
+                    <span x-text="showPasswordConfirmation ? 'Hide' : 'Show'">Show</span>
+                </button>
+            </div>
             <x-input-error :messages="$errors->get('password_confirmation')" />
         </div>
 
