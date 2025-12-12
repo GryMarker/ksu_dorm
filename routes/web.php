@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\InterviewController as AdminInterviewController;
 use App\Http\Controllers\Admin\InterviewSlotController as AdminInterviewSlotController;
 use App\Http\Controllers\Admin\ReservationDecisionController;
 use App\Http\Controllers\Admin\RoomController;
+use App\Http\Controllers\Admin\TenantController as AdminTenantController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\EmployeeCottageController as AdminEmployeeCottageController;
 use App\Http\Controllers\Employee\EmployeeApplyController;
@@ -78,7 +79,7 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('/payments/{payment}/reject', [EmployeePaymentApprovalController::class, 'reject'])->name('president.payments.reject');
     });
 
-    Route::prefix('management')->middleware('role:dorm_master,president')->group(function () {
+    Route::prefix('management')->middleware('role:president')->group(function () {
         Route::get('/cottages', [AdminEmployeeCottageController::class, 'index'])->name('management.cottages.index');
         Route::patch('/cottages/{cottage}/approve', [AdminEmployeeCottageController::class, 'approve'])->name('management.cottages.approve');
         Route::patch('/cottages/{cottage}/reject', [AdminEmployeeCottageController::class, 'reject'])->name('management.cottages.reject');
@@ -86,6 +87,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::middleware('can:viewAny,App\\Models\\Room')->group(function () {
+        Route::get('/admin/students', [AdminTenantController::class, 'index'])->name('admin.students.index');
         Route::resource('admin/rooms', RoomController::class)->names('admin.rooms');
         Route::get('/admin/interviews', [AdminInterviewController::class, 'index'])->name('admin.interviews.index');
         Route::patch('/admin/interviews/{interview}/result', [AdminInterviewController::class, 'result'])->name('admin.interviews.result');
@@ -108,4 +110,3 @@ Route::middleware(['auth'])->group(function () {
 });
 
 require __DIR__.'/auth.php';
-

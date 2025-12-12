@@ -61,12 +61,12 @@
     } elseif (in_array($user->role, ['dorm_master', 'student_director'])) {
         $navItems = [
             ['label' => 'Dashboard', 'href' => route('admin.dashboard'), 'active' => request()->routeIs('admin.dashboard')],
+            ['label' => 'Students', 'href' => route('admin.students.index'), 'active' => request()->routeIs('admin.students.*')],
             ['label' => 'Rooms', 'href' => route('admin.rooms.index'), 'active' => request()->routeIs('admin.rooms.*')],
             ['label' => 'Reservations', 'href' => route('admin.reservations.index'), 'active' => request()->routeIs('admin.reservations.*')],
             ['label' => 'Interview Slots', 'href' => route('admin.interview-slots.index'), 'active' => request()->routeIs('admin.interview-slots.*')],
             ['label' => 'Interviews', 'href' => route('admin.interviews.index'), 'active' => request()->routeIs('admin.interviews.*')],
             ['label' => 'Attendance', 'href' => route('admin.attendance.index'), 'active' => request()->routeIs('admin.attendance.*')],
-            ['label' => 'Employee Cottages', 'href' => route('management.cottages.index'), 'active' => request()->routeIs('management.cottages.*')],
         ];
     } else {
         $navItems = [
@@ -254,7 +254,5 @@
         </div>
     </body>
 </html>
-
-
 
 
