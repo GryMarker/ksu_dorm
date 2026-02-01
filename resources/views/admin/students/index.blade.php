@@ -48,14 +48,22 @@
                                 {{ optional($tenant->updated_at)->format('M d, Y') ?? 'N/A' }}
                             </td>
                             <td class="px-5 py-4">
-                                <x-ksu-button
-                                    type="button"
-                                    variant="outline"
-                                    size="sm"
-                                    x-on:click="$dispatch('open-modal', 'student-profile-{{ $tenant->id }}')"
-                                >
-                                    View Details
-                                </x-ksu-button>
+                            <x-ksu-button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                x-on:click="$dispatch('open-modal', 'student-profile-{{ $tenant->id }}')"
+                            >
+                                View Details
+                            </x-ksu-button>
+                            <x-ksu-button
+                                as="a"
+                                href="{{ route('admin.students.history', $tenant) }}"
+                                variant="subtle"
+                                size="sm"
+                            >
+                                History
+                            </x-ksu-button>
 
                                 <x-modal name="student-profile-{{ $tenant->id }}" maxWidth="2xl">
                                     <div class="space-y-4 p-6">

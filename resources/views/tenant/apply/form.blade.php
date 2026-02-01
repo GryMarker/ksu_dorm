@@ -104,9 +104,27 @@
                                 <x-input-error :messages="$errors->get('place_of_birth')" />
                             </div>
                             <div class="space-y-2">
-                                <x-input-label for="course_year" value="Course and Year" />
-                                <x-text-input id="course_year" name="course_year" type="text" class="mt-1 block w-full" :value="old('course_year', $tenant->course_year)" required />
-                                <x-input-error :messages="$errors->get('course_year')" />
+                                <x-input-label for="university_id_no" value="Student ID (KSU)" />
+                                <x-text-input
+                                    id="university_id_no"
+                                    name="university_id_no"
+                                    type="text"
+                                    class="mt-1 block w-full"
+                                    :value="old('university_id_no', $tenant->university_id_no)"
+                                    placeholder="KSU-0000"
+                                    required
+                                />
+                                <x-input-error :messages="$errors->get('university_id_no')" />
+                            </div>
+                            <div class="space-y-2">
+                                <x-input-label for="program" value="Course / Program" />
+                                <x-text-input id="program" name="program" type="text" class="mt-1 block w-full" :value="old('program', $tenant->program ?? $tenant->course_year)" required />
+                                <x-input-error :messages="$errors->get('program')" />
+                            </div>
+                            <div class="space-y-2">
+                                <x-input-label for="year_level" value="Year Level" />
+                                <x-text-input id="year_level" name="year_level" type="text" class="mt-1 block w-full" :value="old('year_level', $tenant->year_level)" placeholder="e.g., 1, 2, 3, 4" required />
+                                <x-input-error :messages="$errors->get('year_level')" />
                             </div>
                             <div class="space-y-2">
                                 <x-input-label for="cellphone" value="Cellphone Number" />

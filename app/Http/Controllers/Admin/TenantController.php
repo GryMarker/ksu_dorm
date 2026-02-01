@@ -31,4 +31,25 @@ class TenantController extends Controller
             'search' => $search,
         ]);
     }
+
+    public function history(Tenant $tenant): View
+    {
+        $tenant->load([
+            'user',
+            'interviews' => fn ($query) => $query->orderByDesc('scheduled_at'),
+            'reservations' => fn ($query) => $query->latest('requested_at'),
+            'assignments' => fn ($query) => $query->latest('start_date'),
+        ]);
+
+        $attendanceLogs = $tenant->attendanceLogs()
+            ->orderByDesc('timestamp')
+            ->limit(100)
+            ->get()
+            ->reverse();
+
+        return view('admin.students.history', [
+            'tenant' => $tenant,
+            'attendanceLogs' => $attendanceLogs,
+        ]);
+    }
 }

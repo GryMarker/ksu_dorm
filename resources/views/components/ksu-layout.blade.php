@@ -62,6 +62,7 @@
         $navItems = [
             ['label' => 'Dashboard', 'href' => route('admin.dashboard'), 'active' => request()->routeIs('admin.dashboard')],
             ['label' => 'Students', 'href' => route('admin.students.index'), 'active' => request()->routeIs('admin.students.*')],
+            ['label' => 'Applications', 'href' => route('admin.applications.index'), 'active' => request()->routeIs('admin.applications.*')],
             ['label' => 'Rooms', 'href' => route('admin.rooms.index'), 'active' => request()->routeIs('admin.rooms.*')],
             ['label' => 'Reservations', 'href' => route('admin.reservations.index'), 'active' => request()->routeIs('admin.reservations.*')],
             ['label' => 'Interview Slots', 'href' => route('admin.interview-slots.index'), 'active' => request()->routeIs('admin.interview-slots.*')],
@@ -254,5 +255,4 @@
         </div>
     </body>
 </html>
-
 

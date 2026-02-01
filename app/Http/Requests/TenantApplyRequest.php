@@ -16,7 +16,8 @@ class TenantApplyRequest extends FormRequest
             return false;
         }
 
-        return $user->isTenant() || $user->isEmployee();
+        // Student-facing application form only
+        return $user->isTenant() && ($user->tenant?->type === Tenant::TYPE_STUDENT);
     }
 
     public function rules(): array
@@ -33,7 +34,15 @@ class TenantApplyRequest extends FormRequest
             'father_contact' => ['required', 'string', 'max:100'],
             'mother_name' => ['required', 'string', 'max:255'],
             'mother_contact' => ['required', 'string', 'max:100'],
-            'course_year' => ['required', 'string', 'max:255'],
+            'university_id_no' => [
+                'required',
+                'string',
+                'max:50',
+                'regex:/^KSU-[0-9]{4,}$/i',
+                Rule::unique('tenants', 'university_id_no')->ignore($this->user()?->tenant?->id),
+            ],
+            'program' => ['required', 'string', 'max:255'],
+            'year_level' => ['required', 'string', 'max:10'],
             'cellphone' => ['required', 'string', 'max:100'],
             'accept_terms' => ['accepted'],
         ];

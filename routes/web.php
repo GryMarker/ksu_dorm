@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AttendanceController as AdminAttendanceController;
+use App\Http\Controllers\Admin\ApplicationController as AdminApplicationController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\InterviewController as AdminInterviewController;
 use App\Http\Controllers\Admin\InterviewSlotController as AdminInterviewSlotController;
@@ -39,7 +40,7 @@ Route::middleware(['auth'])->group(function () {
         return redirect()->route('admin.dashboard');
     })->name('admin.home');
 
-    Route::middleware('role:tenant')->group(function () {
+    Route::middleware(['role:tenant', 'verified'])->group(function () {
         Route::get('/apply', [ApplyController::class, 'showForm'])->name('tenant.apply.form');
         Route::post('/apply', [ApplyController::class, 'submit'])->name('tenant.apply.submit');
         Route::get('/apply/slots', [TenantInterviewController::class, 'listOpenSlots'])->name('tenant.apply.slots');
@@ -88,6 +89,10 @@ Route::middleware(['auth'])->group(function () {
 
     Route::middleware('can:viewAny,App\\Models\\Room')->group(function () {
         Route::get('/admin/students', [AdminTenantController::class, 'index'])->name('admin.students.index');
+        Route::get('/admin/students/{tenant}/history', [AdminTenantController::class, 'history'])->name('admin.students.history');
+        Route::get('/admin/applications', [AdminApplicationController::class, 'index'])->name('admin.applications.index');
+        Route::patch('/admin/applications/{tenant}/approve', [AdminApplicationController::class, 'approve'])->name('admin.applications.approve');
+        Route::patch('/admin/applications/{tenant}/reject', [AdminApplicationController::class, 'reject'])->name('admin.applications.reject');
         Route::resource('admin/rooms', RoomController::class)->names('admin.rooms');
         Route::get('/admin/interviews', [AdminInterviewController::class, 'index'])->name('admin.interviews.index');
         Route::patch('/admin/interviews/{interview}/result', [AdminInterviewController::class, 'result'])->name('admin.interviews.result');
@@ -100,6 +105,7 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('/admin/reservations/{reservation}/decline', [ReservationDecisionController::class, 'decline'])->name('admin.reservations.decline');
 
         Route::get('/admin/attendance', [AdminAttendanceController::class, 'index'])->name('admin.attendance.index');
+        Route::get('/admin/attendance/monthly', [AdminAttendanceController::class, 'monthly'])->name('admin.attendance.monthly');
         Route::post('/admin/attendance', [AdminAttendanceController::class, 'store'])->name('admin.attendance.store');
         Route::get('/admin/dashboard', AdminDashboardController::class)->name('admin.dashboard');
     });

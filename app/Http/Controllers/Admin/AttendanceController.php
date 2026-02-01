@@ -37,6 +37,43 @@ class AttendanceController extends Controller
         ]);
     }
 
+    public function monthly(Request $request): View
+    {
+        $validated = $request->validate([
+            'month' => ['nullable', 'date_format:Y-m'],
+            'tenant_id' => ['nullable', 'exists:tenants,id'],
+        ]);
+
+        $monthString = $validated['month'] ?? now()->format('Y-m');
+        $start = Carbon::createFromFormat('Y-m', $monthString)->startOfMonth();
+        $end = (clone $start)->endOfMonth();
+
+        $logsQuery = AttendanceLog::with('tenant.user')
+            ->whereBetween('timestamp', [$start, $end])
+            ->orderBy('timestamp');
+
+        if (!empty($validated['tenant_id'])) {
+            $logsQuery->where('tenant_id', $validated['tenant_id']);
+        }
+
+        $logs = $logsQuery->get();
+        $dailyGrouped = $logs->groupBy(fn (AttendanceLog $log) => $log->tenant_id)
+            ->map(fn ($tenantLogs) => $tenantLogs->groupBy(fn (AttendanceLog $log) => $log->timestamp->toDateString()));
+
+        $tenants = Tenant::with('user')->orderBy('full_name')->get();
+
+        return view('admin.attendance.monthly', [
+            'logs' => $logs,
+            'dailyGrouped' => $dailyGrouped,
+            'tenants' => $tenants,
+            'filters' => [
+                'month' => $monthString,
+                'tenant_id' => $validated['tenant_id'] ?? null,
+            ],
+            'range' => [$start, $end],
+        ]);
+    }
+
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([

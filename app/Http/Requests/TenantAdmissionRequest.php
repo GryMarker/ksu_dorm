@@ -17,9 +17,18 @@ class TenantAdmissionRequest extends FormRequest
     {
         return [
             'type' => ['required', Rule::in([Tenant::TYPE_STUDENT, Tenant::TYPE_EMPLOYEE])],
-            'university_id_no' => ['required', 'string', 'max:50'],
-            'program' => ['nullable', 'string', 'max:255'],
-            'year_level' => ['nullable', 'string', 'max:50'],
+            'university_id_no' => [
+                'required',
+                'string',
+                'max:50',
+                Rule::when(
+                    $this->input('type') === Tenant::TYPE_STUDENT,
+                    ['regex:/^KSU-[0-9]{4,}$/i']
+                ),
+                Rule::unique('tenants', 'university_id_no')->ignore($this->user()?->tenant?->id),
+            ],
+            'program' => [Rule::requiredIf($this->input('type') === Tenant::TYPE_STUDENT), 'string', 'max:255'],
+            'year_level' => [Rule::requiredIf($this->input('type') === Tenant::TYPE_STUDENT), 'string', 'max:50'],
             'phone' => ['required', 'string', 'max:30'],
             'emergency_contact_name' => ['required', 'string', 'max:255'],
             'emergency_contact_phone' => ['required', 'string', 'max:30'],

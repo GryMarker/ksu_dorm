@@ -1,8 +1,13 @@
 <x-ksu-layout page-title="Attendance Logs">
     <div class="space-y-8">
-        <div>
-            <h1 class="text-2xl font-semibold text-ksu-900 sm:text-3xl">Attendance Logs</h1>
-            <p class="mt-1 text-sm text-slate-600">Review daily entries and exits across all tenants. Use filters to narrow the results.</p>
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h1 class="text-2xl font-semibold text-ksu-900 sm:text-3xl">Attendance Logs</h1>
+                <p class="mt-1 text-sm text-slate-600">Review daily entries and exits across all tenants. Use filters to narrow the results.</p>
+            </div>
+            <x-ksu-button as="a" href="{{ route('admin.attendance.monthly', ['month' => now()->format('Y-m')]) }}" variant="subtle" size="sm">
+                Monthly Report
+            </x-ksu-button>
         </div>
 
         @if (auth()->user()?->isDormMaster())

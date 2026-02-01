@@ -37,4 +37,16 @@ class NotificationService
             report($throwable);
         }
     }
+
+    public static function logChannel(User $user, string $channel, string $templateKey, array $payload = [], string $status = 'sent'): void
+    {
+        NotificationLog::create([
+            'user_id' => $user->id,
+            'channel' => $channel,
+            'template_key' => $templateKey,
+            'payload_json' => $payload,
+            'status' => $status,
+            'sent_at' => now(),
+        ]);
+    }
 }

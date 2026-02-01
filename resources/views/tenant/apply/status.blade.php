@@ -5,24 +5,34 @@
 
     $steps = [
         [
-            'label' => 'Draft Application',
+            'label' => 'Application',
             'hint' => 'Submit all required information.',
             'state' => $status === TenantModel::STATUS_DRAFT ? 'current' : 'completed',
         ],
         [
+            'label' => 'Dorm Master Review',
+            'hint' => 'Application is screened for eligibility.',
+            'state' => match ($status) {
+                TenantModel::STATUS_FOR_APPROVAL => 'current',
+                TenantModel::STATUS_FOR_INTERVIEW, TenantModel::STATUS_APPROVED, TenantModel::STATUS_RECHECK => 'completed',
+                TenantModel::STATUS_REJECTED => 'rejected',
+                default => 'upcoming',
+            },
+        ],
+        [
             'label' => 'Interview',
-            'hint' => 'Attend your scheduled interview.',
+            'hint' => 'Attend the scheduled screening.',
             'state' => match ($status) {
                 TenantModel::STATUS_FOR_INTERVIEW => 'current',
-                TenantModel::STATUS_FOR_APPROVAL, TenantModel::STATUS_APPROVED, TenantModel::STATUS_REJECTED, TenantModel::STATUS_RECHECK => 'completed',
+                TenantModel::STATUS_APPROVED, TenantModel::STATUS_RECHECK => 'completed',
+                TenantModel::STATUS_REJECTED => 'rejected',
                 default => 'upcoming',
             },
         ],
         [
             'label' => 'Decision',
-            'hint' => 'Await approval or further action.',
+            'hint' => 'Final dorm admission result.',
             'state' => match ($status) {
-                TenantModel::STATUS_FOR_APPROVAL => 'current',
                 TenantModel::STATUS_APPROVED => 'completed',
                 TenantModel::STATUS_REJECTED => 'rejected',
                 TenantModel::STATUS_RECHECK => 'recheck',
@@ -41,6 +51,11 @@
 
 <x-ksu-layout page-title="Application Status">
     <div class="space-y-8">
+        @if ($errors->any())
+            <div class="rounded-2xl border border-crimson/20 bg-crimson/5 px-5 py-4 text-sm text-crimson">
+                {{ $errors->first() }}
+            </div>
+        @endif
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
                 <h1 class="text-2xl font-semibold text-ksu-900 sm:text-3xl">Application Status</h1>
@@ -65,11 +80,11 @@
                         @case(TenantModel::STATUS_DRAFT)
                             <p>Finish your application form and accept the dormitory policies to move to the interview stage.</p>
                             @break
-                        @case(TenantModel::STATUS_FOR_INTERVIEW)
-                            <p>Your application is queued for an interview. Book a slot and prepare your requirements.</p>
-                            @break
                         @case(TenantModel::STATUS_FOR_APPROVAL)
-                            <p>Your interview is done. Awaiting final approval from the dorm administrators.</p>
+                            <p>Your application is pending Dorm Master review. We will notify you once an interview is scheduled.</p>
+                            @break
+                        @case(TenantModel::STATUS_FOR_INTERVIEW)
+                            <p>Your interview has been scheduled. Please prepare your requirements and arrive on time.</p>
                             @break
                         @case(TenantModel::STATUS_APPROVED)
                             <p>Congratulations! You are approved for dorm admission. Reserve a room to complete your onboarding.</p>
@@ -78,8 +93,10 @@
                             <p>Your application was not approved. You may reach out to the dorm master for clarifications.</p>
                             @break
                         @case(TenantModel::STATUS_RECHECK)
-                            <p>Additional information is required. Update your application and select a new interview slot if prompted.</p>
+                            <p>Additional information is required. Update your application and await a new review.</p>
                             @break
+                        @default
+                            <p>Finish your application and submit it for review to continue.</p>
                     @endswitch
                 </div>
             </div>

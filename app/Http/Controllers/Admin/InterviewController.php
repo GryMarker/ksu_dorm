@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\InterviewResultStaffMail;
 use App\Mail\InterviewResultMail;
 use App\Models\Interview;
 use App\Models\Tenant;
+use App\Models\User;
 use App\Services\NotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -18,6 +20,7 @@ class InterviewController extends Controller
     public function index(): View
     {
         $interviews = Interview::with(['tenant.user', 'interviewer', 'slot'])
+            ->whereHas('tenant', fn ($query) => $query->where('onboarding_status', '!=', Tenant::STATUS_APPROVED))
             ->orderByRaw('CASE WHEN conducted_at IS NULL THEN 0 ELSE 1 END')
             ->orderBy('scheduled_at')
             ->paginate(20);
@@ -61,6 +64,23 @@ class InterviewController extends Controller
                 'result' => $validated['result'],
             ]
         );
+
+        $dormMasters = User::where('role', User::ROLE_DORM_MASTER)
+            ->whereKeyNot($request->user()->id)
+            ->get();
+
+        foreach ($dormMasters as $dormMaster) {
+            NotificationService::queueMail(
+                $dormMaster,
+                new InterviewResultStaffMail($tenant, $interview),
+                'interview.result.staff',
+                [
+                    'tenant_id' => $tenant->id,
+                    'interview_id' => $interview->id,
+                    'result' => $validated['result'],
+                ]
+            );
+        }
 
         return redirect()->route('admin.interviews.index')->with('status', 'Interview result saved.');
     }

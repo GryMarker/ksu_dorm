@@ -13,9 +13,15 @@ use Illuminate\View\View;
 
 class InterviewController extends Controller
 {
-    public function listOpenSlots(Request $request): View
+    public function listOpenSlots(Request $request): View|RedirectResponse
     {
         $tenant = $request->user()->tenant()->firstOrFail();
+
+        if (!in_array($tenant->onboarding_status, [Tenant::STATUS_FOR_INTERVIEW, Tenant::STATUS_APPROVED], true)) {
+            return redirect()
+                ->route('tenant.apply.status')
+                ->withErrors('Your application is pending Dorm Master review before you can pick an interview slot.');
+        }
         $currentInterview = $tenant->interviews()
             ->whereNull('result')
             ->latest('scheduled_at')
@@ -50,6 +56,12 @@ class InterviewController extends Controller
     public function bookSlot(Request $request, InterviewSlot $slot): RedirectResponse
     {
         $tenant = $request->user()->tenant()->firstOrFail();
+
+        if (!in_array($tenant->onboarding_status, [Tenant::STATUS_FOR_INTERVIEW, Tenant::STATUS_APPROVED], true)) {
+            return redirect()
+                ->route('tenant.apply.status')
+                ->withErrors('Your application is pending Dorm Master review before you can book an interview.');
+        }
 
         if ($slot->status !== 'open') {
             return redirect()->route('tenant.apply.slots')->withErrors('This slot is no longer available.');
