@@ -13,10 +13,17 @@ class AttendanceController extends Controller
         $tenant = $request->user()->tenant()->firstOrFail();
 
         $logs = $tenant->attendanceLogs()->orderByDesc('timestamp')->paginate(25);
+        $latestLog = $tenant->attendanceLogs()->latest('timestamp')->first();
+        $todayLogs = $tenant->attendanceLogs()
+            ->whereDate('timestamp', today())
+            ->orderByDesc('timestamp')
+            ->get();
 
         return view('tenant.attendance', [
             'tenant' => $tenant,
             'logs' => $logs,
+            'latestLog' => $latestLog,
+            'todayLogs' => $todayLogs,
         ]);
     }
 }

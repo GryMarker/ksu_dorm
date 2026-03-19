@@ -10,11 +10,47 @@
         <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
                 <h1 class="text-3xl font-semibold text-ksu-900 sm:text-4xl">Attendance Logs</h1>
-                <p class="mt-1 text-sm text-slate-600">Track your dorm check-ins and check-outs. Use the filters to narrow your view.</p>
+                <p class="mt-1 text-sm text-slate-600">Track your dorm check-ins and check-outs. Scan the active Dorm Master QR screen to record attendance.</p>
             </div>
             <x-ksu-badge variant="info" class="bg-slate-100 text-slate-600">
                 Showing {{ $logs->count() }} of {{ $logs->total() }} records
             </x-ksu-badge>
+        </div>
+
+        @if (session('status'))
+            <div class="rounded-2xl border border-ksu-600/20 bg-ksu-100/60 px-5 py-4 text-sm font-medium text-ksu-800">
+                {{ session('status') }}
+            </div>
+        @endif
+
+        @if ($errors->any())
+            <div class="rounded-2xl border border-crimson/20 bg-crimson/5 px-5 py-4 text-sm text-crimson">
+                {{ $errors->first() }}
+            </div>
+        @endif
+
+        <div class="grid gap-4 lg:grid-cols-3">
+            <x-ksu-card title="Current Status">
+                <p class="text-3xl font-semibold uppercase text-ksu-900">
+                    {{ $latestLog?->type === 'in' ? 'IN' : 'OUT' }}
+                </p>
+                <p class="mt-2 text-sm text-slate-600">
+                    @if ($latestLog)
+                        Last scan {{ $latestLog->timestamp->timezone(config('app.timezone'))->format('M d, Y h:i A') }}
+                    @else
+                        No scans recorded yet.
+                    @endif
+                </p>
+            </x-ksu-card>
+
+            <x-ksu-card title="Today">
+                <p class="text-3xl font-semibold text-ksu-900">{{ $todayLogs->count() }}</p>
+                <p class="mt-2 text-sm text-slate-600">Scans recorded today.</p>
+            </x-ksu-card>
+
+            <x-ksu-card title="How To Scan">
+                <p class="text-sm text-slate-600">Open your phone camera, scan the Dorm Master QR screen, log in if needed, then confirm the action on your phone.</p>
+            </x-ksu-card>
         </div>
 
         <x-ksu-card title="Filter Logs">

@@ -1,6 +1,10 @@
 <x-guest-layout>
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
+    <p class="mb-6 text-sm text-slate-600">
+        Sign in with your password, then enter the one-time verification code sent to your email.
+    </p>
+
     <form method="POST" action="{{ route('login') }}" class="space-y-6" x-data="{ showPassword: false }">
         @csrf
 

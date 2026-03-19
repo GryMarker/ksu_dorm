@@ -5,9 +5,16 @@
                 <h1 class="text-2xl font-semibold text-ksu-900 sm:text-3xl">Attendance Logs</h1>
                 <p class="mt-1 text-sm text-slate-600">Review daily entries and exits across all tenants. Use filters to narrow the results.</p>
             </div>
-            <x-ksu-button as="a" href="{{ route('admin.attendance.monthly', ['month' => now()->format('Y-m')]) }}" variant="subtle" size="sm">
-                Monthly Report
-            </x-ksu-button>
+            <div class="flex flex-wrap gap-2">
+                @if (auth()->user()?->isDormMaster())
+                    <x-ksu-button as="a" href="{{ route('admin.attendance.qr') }}" variant="outline" size="sm">
+                        QR Screen
+                    </x-ksu-button>
+                @endif
+                <x-ksu-button as="a" href="{{ route('admin.attendance.monthly', ['month' => now()->format('Y-m')]) }}" variant="subtle" size="sm">
+                    Monthly Report
+                </x-ksu-button>
+            </div>
         </div>
 
         @if (auth()->user()?->isDormMaster())

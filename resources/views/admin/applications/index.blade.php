@@ -39,6 +39,15 @@
                                         <x-ksu-badge variant="pending" size="sm" class="uppercase">
                                             {{ Str::headline($tenant->onboarding_status) }}
                                         </x-ksu-badge>
+                                        <x-ksu-button
+                                            type="button"
+                                            size="sm"
+                                            variant="outline"
+                                            x-data
+                                            x-on:click="$dispatch('open-modal', 'application-form-{{ $tenant->id }}')"
+                                        >
+                                            View Form
+                                        </x-ksu-button>
                                     </div>
                                     <dl class="grid gap-2 text-sm text-slate-600 sm:grid-cols-2">
                                         <div class="flex items-center justify-between rounded-xl bg-white px-3 py-2">
@@ -142,6 +151,30 @@
                                     </form>
                                 </div>
                             </div>
+
+                            <x-modal name="application-form-{{ $tenant->id }}" maxWidth="2xl">
+                                <div class="space-y-4 p-6 sm:p-8">
+                                    <div class="flex items-start justify-between gap-4 border-b border-slate-200 pb-4">
+                                        <div>
+                                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Application Form</p>
+                                            <h2 class="text-xl font-semibold text-ksu-900">{{ $tenant->full_name ?? $tenant->user->name }}</h2>
+                                        </div>
+                                        <x-ksu-button
+                                            type="button"
+                                            size="sm"
+                                            variant="outline"
+                                            x-data
+                                            x-on:click="$dispatch('close-modal', 'application-form-{{ $tenant->id }}')"
+                                        >
+                                            Close
+                                        </x-ksu-button>
+                                    </div>
+
+                                    <div class="max-h-[75vh] overflow-y-auto pr-1">
+                                        <x-applicant-details :tenant="$tenant" />
+                                    </div>
+                                </div>
+                            </x-modal>
                         </div>
                     @endforeach
                 </div>

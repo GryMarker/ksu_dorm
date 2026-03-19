@@ -20,8 +20,6 @@
         "Father's Contact" => $tenant->father_contact,
         "Mother's Name" => $tenant->mother_name,
         "Mother's Contact" => $tenant->mother_contact,
-        'Emergency Contact' => $tenant->emergency_contact_name,
-        'Emergency Phone' => $tenant->emergency_contact_phone,
     ];
 @endphp
 
@@ -66,9 +64,6 @@
         <div class="space-y-3 rounded-2xl border border-slate-200/80 bg-white p-5">
             <div class="flex items-center justify-between">
                 <h4 class="text-sm font-semibold text-ksu-900">Guardians & Contacts</h4>
-                @if ($tenant->medical_notes)
-                    <x-ksu-badge variant="warning" size="sm">Medical Notes</x-ksu-badge>
-                @endif
             </div>
             <dl class="grid grid-cols-1 gap-2 text-sm text-slate-700">
                 @foreach ($guardianDetails as $label => $value)
@@ -77,10 +72,6 @@
                         <dd class="text-right font-medium text-ksu-900">{{ $value ?: 'N/A' }}</dd>
                     </div>
                 @endforeach
-                <div class="space-y-1 rounded-xl bg-ksu-50/60 px-3 py-2">
-                    <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Medical Notes</dt>
-                    <dd class="whitespace-pre-line text-sm font-medium text-ksu-900">{{ $tenant->medical_notes ?: 'N/A' }}</dd>
-                </div>
             </dl>
         </div>
     </div>

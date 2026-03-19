@@ -3,10 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Assignment;
 use App\Models\Bed;
 use App\Models\Room;
+use App\Models\Tenant;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -57,7 +61,84 @@ class RoomController extends Controller
 
         return view('admin.rooms.show', [
             'room' => $room,
+            'assignableStudents' => Tenant::query()
+                ->with(['user', 'activeAssignment.room'])
+                ->where('type', Tenant::TYPE_STUDENT)
+                ->where('onboarding_status', Tenant::STATUS_APPROVED)
+                ->orderBy('full_name')
+                ->get(),
         ]);
+    }
+
+    public function assign(Request $request, Room $room): RedirectResponse
+    {
+        $this->authorize('assign', $room);
+
+        if ($room->status !== Room::STATUS_OPEN) {
+            return redirect()->back()->withErrors('Only open rooms can receive direct student assignments.');
+        }
+
+        $validated = $request->validate([
+            'tenant_id' => ['required', 'exists:tenants,id'],
+            'bed_id' => ['required', 'exists:beds,id'],
+        ]);
+
+        $tenant = Tenant::query()
+            ->with(['user', 'activeAssignment.bed'])
+            ->where('id', $validated['tenant_id'])
+            ->where('type', Tenant::TYPE_STUDENT)
+            ->where('onboarding_status', Tenant::STATUS_APPROVED)
+            ->first();
+
+        if (! $tenant) {
+            return redirect()->back()->withErrors('Selected student is not eligible for direct room assignment.');
+        }
+
+        DB::transaction(function () use ($room, $tenant, $validated) {
+            $lockedRoom = Room::query()
+                ->whereKey($room->id)
+                ->with('beds')
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $bed = $lockedRoom->beds->firstWhere('id', (int) $validated['bed_id']);
+
+            if (! $bed) {
+                abort(400, 'Selected bed does not belong to this room.');
+            }
+
+            if ($bed->is_occupied && $bed->occupant_tenant_id !== $tenant->id) {
+                abort(400, 'Selected bed is already occupied.');
+            }
+
+            $currentAssignment = $tenant->activeAssignment;
+
+            if ($currentAssignment) {
+                if ($currentAssignment->room_id === $lockedRoom->id && $currentAssignment->bed_id === $bed->id) {
+                    if (! $bed->is_occupied || $bed->occupant_tenant_id !== $tenant->id) {
+                        $this->activateBed($bed, $tenant->id);
+                    }
+
+                    return;
+                }
+
+                $this->releaseAssignment($currentAssignment, 'admin_reassignment');
+            }
+
+            $this->activateBed($bed, $tenant->id);
+
+            Assignment::create([
+                'tenant_id' => $tenant->id,
+                'room_id' => $lockedRoom->id,
+                'bed_id' => $bed->id,
+                'start_date' => Carbon::today(),
+                'is_active' => true,
+            ]);
+        });
+
+        return redirect()
+            ->route('admin.rooms.show', $room)
+            ->with('status', 'Student assigned to room successfully.');
     }
 
     public function edit(Room $room): View
@@ -117,6 +198,28 @@ class RoomController extends Controller
 
         $room->beds()->whereNotIn('bed_label', self::DEFAULT_BEDS)->delete();
     }
+
+    private function activateBed(Bed $bed, int $tenantId): void
+    {
+        $bed->update([
+            'is_occupied' => true,
+            'occupant_tenant_id' => $tenantId,
+        ]);
+    }
+
+    private function releaseAssignment(Assignment $assignment, string $reason): void
+    {
+        $assignment->update([
+            'is_active' => false,
+            'end_date' => Carbon::today(),
+            'moved_out_reason' => $reason,
+        ]);
+
+        if ($assignment->bed) {
+            $assignment->bed->update([
+                'is_occupied' => false,
+                'occupant_tenant_id' => null,
+            ]);
+        }
+    }
 }
-
-

@@ -23,6 +23,7 @@ class ApplyController extends Controller
 
         return view('tenant.apply.form', [
             'tenant' => $tenant,
+            'hasInterviewSlot' => $tenant->interviews()->whereNotNull('slot_id')->exists(),
         ]);
     }
 

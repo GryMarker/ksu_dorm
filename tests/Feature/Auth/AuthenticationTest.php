@@ -3,7 +3,10 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\User;
+use App\Notifications\LoginTwoFactorCode;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class AuthenticationTest extends TestCase
@@ -19,19 +22,41 @@ class AuthenticationTest extends TestCase
 
     public function test_users_can_authenticate_using_the_login_screen(): void
     {
+        Notification::fake();
+
         $user = User::factory()->create();
+        $code = null;
 
         $response = $this->post('/login', [
             'email' => $user->email,
             'password' => 'password',
         ]);
 
-        $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
+        $this->assertGuest();
+        $response->assertRedirect(route('two-factor.challenge'));
+
+        $session = $this->app['session.store'];
+        $challenge = $session->get('auth.two_factor_login');
+
+        Notification::assertSentTo($user, LoginTwoFactorCode::class, function (LoginTwoFactorCode $notification) use (&$code) {
+            $code = $notification->code;
+
+            return true;
+        });
+
+        $verifyResponse = $this->post('/login/verify', [
+            'code' => $code,
+        ]);
+
+        $this->assertAuthenticatedAs($user);
+        $verifyResponse->assertRedirect(route('dashboard', absolute: false));
+        $this->assertNull(Cache::get('login_2fa:'.$challenge['attempt_id']));
     }
 
     public function test_users_can_not_authenticate_with_invalid_password(): void
     {
+        Notification::fake();
+
         $user = User::factory()->create();
 
         $this->post('/login', [
@@ -40,6 +65,74 @@ class AuthenticationTest extends TestCase
         ]);
 
         $this->assertGuest();
+        Notification::assertNothingSent();
+    }
+
+    public function test_users_can_not_complete_login_with_an_invalid_two_factor_code(): void
+    {
+        Notification::fake();
+
+        $user = User::factory()->create();
+
+        $this->post('/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $response = $this->post('/login/verify', [
+            'code' => '000000',
+        ]);
+
+        $this->assertGuest();
+        $response->assertSessionHasErrors('code');
+    }
+
+    public function test_dorm_masters_can_log_in_without_two_factor_authentication(): void
+    {
+        Notification::fake();
+
+        $user = User::factory()->create([
+            'role' => User::ROLE_DORM_MASTER,
+        ]);
+
+        $response = $this->post('/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $this->assertAuthenticatedAs($user);
+        $response->assertRedirect(route('dashboard', absolute: false));
+        Notification::assertNothingSent();
+        $this->assertNull($this->app['session.store']->get('auth.two_factor_login'));
+    }
+
+    public function test_tenant_two_factor_verification_sets_a_trusted_device_cookie(): void
+    {
+        Notification::fake();
+
+        $user = User::factory()->create([
+            'role' => User::ROLE_TENANT,
+        ]);
+        $code = null;
+        $userAgent = 'TenantTrustedDeviceTest/1.0';
+
+        $this->withHeader('User-Agent', $userAgent)->post('/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ])->assertRedirect(route('two-factor.challenge'));
+
+        Notification::assertSentTo($user, LoginTwoFactorCode::class, function (LoginTwoFactorCode $notification) use (&$code) {
+            $code = $notification->code;
+
+            return true;
+        });
+
+        $verifyResponse = $this->withHeader('User-Agent', $userAgent)->post('/login/verify', [
+            'code' => $code,
+        ]);
+
+        $verifyResponse->assertRedirect(route('dashboard', absolute: false));
+        $verifyResponse->assertCookie('tenant_trusted_device');
     }
 
     public function test_users_can_logout(): void

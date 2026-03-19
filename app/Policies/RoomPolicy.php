@@ -31,4 +31,9 @@ class RoomPolicy
     {
         return $user->isDormMaster();
     }
+
+    public function assign(User $user, Room $room): bool
+    {
+        return $this->viewAny($user);
+    }
 }

@@ -235,7 +235,9 @@ I hereby adhere to all above-mentioned policies; any violations of the policies 
                 </div>
 
                 <div class="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
-                    <x-ksu-button type="reset" variant="subtle" class="sm:w-auto">Clear Form</x-ksu-button>
+                    @unless ($hasInterviewSlot)
+                        <x-ksu-button type="reset" variant="subtle" class="sm:w-auto">Clear Form</x-ksu-button>
+                    @endunless
                     <x-ksu-button
                         type="submit"
                         class="sm:w-auto"
