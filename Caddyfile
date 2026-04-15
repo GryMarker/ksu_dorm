@@ -39,12 +39,8 @@
 		resolve_root_symlink
 	}
 
-	# Catch upstream/PHP errors and log them visibly
+	# Catch upstream/PHP errors and return a plain-text response
 	handle_errors {
-		log {
-			output stderr
-			level  ERROR
-		}
 		respond "Server error {http.error.status_code}: {http.error.message}" {http.error.status_code}
 	}
 }
