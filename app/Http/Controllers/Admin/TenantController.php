@@ -34,11 +34,13 @@ class TenantController extends Controller
 
     public function history(Tenant $tenant): View
     {
+        abort_unless($tenant->type === Tenant::TYPE_STUDENT, 404);
+
         $tenant->load([
             'user',
             'interviews' => fn ($query) => $query->orderByDesc('scheduled_at'),
-            'reservations' => fn ($query) => $query->latest('requested_at'),
-            'assignments' => fn ($query) => $query->latest('start_date'),
+            'reservations' => fn ($query) => $query->with('room')->latest('requested_at'),
+            'assignments' => fn ($query) => $query->with(['room', 'bed'])->latest('start_date'),
         ]);
 
         $attendanceLogs = $tenant->attendanceLogs()
