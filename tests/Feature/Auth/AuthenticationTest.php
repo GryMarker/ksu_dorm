@@ -135,6 +135,37 @@ class AuthenticationTest extends TestCase
         $verifyResponse->assertCookie('tenant_trusted_device');
     }
 
+    public function test_email_verification_notice_sends_a_code(): void
+    {
+        Notification::fake();
+
+        $user = User::factory()->unverified()->create();
+        $code = null;
+
+        $response = $this->actingAs($user)->get('/verify-email');
+
+        $response->assertRedirect(route('two-factor.challenge'));
+        $this->assertGuest();
+
+        Notification::assertSentTo($user, LoginTwoFactorCode::class, function (LoginTwoFactorCode $notification) use (&$code) {
+            $code = $notification->code;
+
+            return true;
+        });
+
+        $this->post('/login/verify', [
+            'code' => $code,
+        ])->assertRedirect(route('dashboard', absolute: false));
+
+        $this->assertAuthenticatedAs($user);
+        $this->assertNotNull($user->fresh()->email_verified_at);
+    }
+
+    public function test_signed_email_verification_url_is_not_registered(): void
+    {
+        $this->get('/verify-email/1/not-a-code')->assertNotFound();
+    }
+
     public function test_users_can_logout(): void
     {
         $user = User::factory()->create();

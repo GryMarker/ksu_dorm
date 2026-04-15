@@ -1,7 +1,7 @@
 <x-guest-layout>
     <div class="space-y-4">
         <p class="text-sm text-slate-600">
-            {{ __('Forgot your password? No problem. Enter your email address and we will email you a password reset link.') }}
+            {{ __('Forgot your password? Enter your email address and we will email you a password reset code.') }}
         </p>
 
         @if (session('status'))
@@ -21,7 +21,7 @@
         </div>
 
         <x-ksu-button type="submit" full>
-            {{ __('Email Password Reset Link') }}
+            {{ __('Email Password Reset Code') }}
         </x-ksu-button>
     </form>
 </x-guest-layout>

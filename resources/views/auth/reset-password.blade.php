@@ -2,12 +2,25 @@
     <form method="POST" action="{{ route('password.store') }}" class="space-y-6">
         @csrf
 
-        <input type="hidden" name="token" value="{{ $request->route('token') }}">
-
         <div class="space-y-2">
             <x-input-label for="email" :value="__('Email')" />
             <x-text-input id="email" name="email" type="email" :value="old('email', $request->email)" required autofocus autocomplete="username" />
             <x-input-error :messages="$errors->get('email')" />
+        </div>
+
+        <div class="space-y-2">
+            <x-input-label for="code" :value="__('Password Reset Code')" />
+            <x-text-input
+                id="code"
+                name="code"
+                type="text"
+                :value="old('code')"
+                required
+                inputmode="numeric"
+                autocomplete="one-time-code"
+                maxlength="6"
+            />
+            <x-input-error :messages="$errors->get('code')" />
         </div>
 
         <div class="space-y-2">
