@@ -3,7 +3,7 @@
 @php
     $tenantName = $tenant->full_name ?: $tenant->user->name;
     $contactDetails = [
-        'University ID' => $tenant->university_id_no,
+        'Student ID' => $tenant->university_id_no,
         'Program / Year' => trim(($tenant->program ?? $tenant->course_year ?? '') . ($tenant->year_level ? ' - Year ' . $tenant->year_level : '')),
         'Nickname' => $tenant->nickname,
         'Gender' => $tenant->gender ? \Illuminate\Support\Str::headline($tenant->gender) : null,

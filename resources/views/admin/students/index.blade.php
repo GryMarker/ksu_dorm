@@ -21,7 +21,7 @@
             @if ($tenants->isEmpty())
                 <p class="text-sm text-slate-500">No students found.</p>
             @else
-                <x-ksu-table :headers="['Student', 'University ID', 'Status', 'Updated', 'Action']">
+                <x-ksu-table :headers="['Student', 'Student ID', 'Status', 'Updated', 'Action']">
                     @foreach ($tenants as $tenant)
                         @php
                             $statusVariantMap = [

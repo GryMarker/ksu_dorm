@@ -20,10 +20,10 @@ class TenantAdmissionRequest extends FormRequest
             'university_id_no' => [
                 'required',
                 'string',
-                'max:50',
+                'max:8',
                 Rule::when(
                     $this->input('type') === Tenant::TYPE_STUDENT,
-                    ['regex:/^KSU-[0-9]{4,}$/i']
+                    ['regex:/^\d{2}-\d{5}$/']
                 ),
                 Rule::unique('tenants', 'university_id_no')->ignore($this->user()?->tenant?->id),
             ],
@@ -35,6 +35,13 @@ class TenantAdmissionRequest extends FormRequest
             'medical_notes' => ['nullable', 'string'],
             'admission_form' => ['nullable', 'array'],
             'admission_form.*' => ['nullable'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'university_id_no.regex' => 'The student ID must use the format 00-00000.',
         ];
     }
 }

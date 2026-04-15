@@ -104,16 +104,19 @@
                                 <x-input-error :messages="$errors->get('place_of_birth')" />
                             </div>
                             <div class="space-y-2">
-                                <x-input-label for="university_id_no" value="Student ID (KSU)" />
+                                <x-input-label for="university_id_no" value="Student ID" />
                                 <x-text-input
                                     id="university_id_no"
                                     name="university_id_no"
                                     type="text"
                                     class="mt-1 block w-full"
                                     :value="old('university_id_no', $tenant->university_id_no)"
-                                    placeholder="KSU-0000"
+                                    placeholder="00-00000"
+                                    pattern="[0-9]{2}-[0-9]{5}"
+                                    maxlength="8"
                                     required
                                 />
+                                <p class="text-xs text-slate-500">Format: 00-00000</p>
                                 <x-input-error :messages="$errors->get('university_id_no')" />
                             </div>
                             <div class="space-y-2">
