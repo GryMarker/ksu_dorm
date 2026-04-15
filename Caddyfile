@@ -1,9 +1,23 @@
 {
 	frankenphp
+
+	# Global server-level logging
+	log {
+		level INFO
+	}
 }
 
 :80 {
 	root * /app/public
+
+	# Enable gzip/zstd compression
+	encode zstd gzip
+
+	# Access and error logging for this site
+	log {
+		output stderr
+		level  DEBUG
+	}
 
 	# Serve static files directly with caching headers
 	@static {
@@ -14,5 +28,23 @@
 	file_server @static
 
 	# Route all other requests through FrankenPHP (Laravel)
-	php_server
+	php_server {
+		# Resolve index.php for every request that doesn't match a real file
+		index index.php
+
+		# Split the path at .php so PATH_INFO is set correctly
+		split .php
+
+		# Pass the original client IP when behind a proxy
+		resolve_root_symlink
+	}
+
+	# Catch upstream/PHP errors and log them visibly
+	handle_errors {
+		log {
+			output stderr
+			level  ERROR
+		}
+		respond "Server error {http.error.status_code}: {http.error.message}" {http.error.status_code}
+	}
 }
