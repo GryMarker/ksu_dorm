@@ -36,13 +36,20 @@ class PasswordResetCodeController extends Controller
 
         $user = User::query()->where('email', $request->string('email')->toString())->first();
 
+        $mailSent = true;
+
         if ($user) {
-            $this->passwordResetCodeService->send($user);
+            $mailSent = $this->passwordResetCodeService->send($user);
         }
 
         return redirect()
             ->route('password.reset')
             ->withInput($request->only('email'))
-            ->with('status', 'If that email exists, we sent a password reset code.');
+            ->with(
+                $mailSent ? 'status' : 'error',
+                $mailSent
+                    ? 'If that email exists, we sent a password reset code.'
+                    : 'We could not send the password reset code. Check the mail settings and try again.'
+            );
     }
 }

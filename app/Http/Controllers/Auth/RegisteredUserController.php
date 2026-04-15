@@ -70,19 +70,20 @@ class RegisteredUserController extends Controller
             'admission_form_json' => [],
         ]);
 
-        $request->session()->put(
-            TwoFactorChallengeService::SESSION_KEY,
-            $this->twoFactorChallengeService->begin(
-                $user,
-                false,
-                $userType === Tenant::TYPE_EMPLOYEE ? 'employee.apply.form' : 'tenant.apply.form',
-                true
-            )
+        $challenge = $this->twoFactorChallengeService->begin(
+            $user,
+            false,
+            $userType === Tenant::TYPE_EMPLOYEE ? 'employee.apply.form' : 'tenant.apply.form',
+            true
         );
 
+        $request->session()->put(TwoFactorChallengeService::SESSION_KEY, $challenge);
+
         return redirect()->route('two-factor.challenge')->with(
-            'status',
-            'Your account was created. We sent a one-time verification code to '.$user->email.'.'
+            $challenge['mail_sent'] ? 'status' : 'error',
+            $challenge['mail_sent']
+                ? 'Your account was created. We sent a one-time verification code to '.$user->email.'.'
+                : 'Your account was created, but we could not send the verification code. Check the mail settings, then request a new code.'
         );
     }
 }

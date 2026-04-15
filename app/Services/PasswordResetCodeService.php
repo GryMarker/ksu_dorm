@@ -5,13 +5,15 @@ namespace App\Services;
 use App\Models\User;
 use App\Notifications\PasswordResetCode;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Throwable;
 
 class PasswordResetCodeService
 {
     public const TTL_MINUTES = 10;
 
-    public function send(User $user): void
+    public function send(User $user): bool
     {
         $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
@@ -20,7 +22,30 @@ class PasswordResetCodeService
             'code_hash' => hash('sha256', $code),
         ], now()->addMinutes(self::TTL_MINUTES));
 
-        $user->notify(new PasswordResetCode($code, self::TTL_MINUTES));
+        try {
+            $user->notify(new PasswordResetCode($code, self::TTL_MINUTES));
+
+            return true;
+        } catch (Throwable $exception) {
+            Log::error('Unable to send password reset code.', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'exception' => $exception,
+            ]);
+
+            if (config('auth.log_codes')) {
+                Log::info('Password reset code fallback.', [
+                    'user_id' => $user->id,
+                    'email' => $user->email,
+                    'code' => $code,
+                    'expires_in_minutes' => self::TTL_MINUTES,
+                ]);
+            } else {
+                Cache::forget($this->cacheKey($user->email));
+            }
+
+            return false;
+        }
     }
 
     public function verify(string $email, string $code): ?User

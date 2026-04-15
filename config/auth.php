@@ -112,4 +112,17 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Authentication Code Logging
+    |--------------------------------------------------------------------------
+    |
+    | This is intended only for temporary demos or SMTP-blocked staging
+    | deployments. Never enable it for real users because it writes one-time
+    | verification codes to application logs.
+    |
+    */
+
+    'log_codes' => env('AUTH_LOG_CODES', false),
+
 ];

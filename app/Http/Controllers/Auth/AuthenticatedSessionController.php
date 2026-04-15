@@ -53,14 +53,15 @@ class AuthenticatedSessionController extends Controller
             return redirect()->intended(route('dashboard', absolute: false));
         }
 
-        $request->session()->put(
-            TwoFactorChallengeService::SESSION_KEY,
-            $this->twoFactorChallengeService->begin($user, $request->boolean('remember'), 'dashboard')
-        );
+        $challenge = $this->twoFactorChallengeService->begin($user, $request->boolean('remember'), 'dashboard');
+
+        $request->session()->put(TwoFactorChallengeService::SESSION_KEY, $challenge);
 
         return redirect()->route('two-factor.challenge')->with(
-            'status',
-            'We sent a one-time login code to '.$user->email.'.'
+            $challenge['mail_sent'] ? 'status' : 'error',
+            $challenge['mail_sent']
+                ? 'We sent a one-time login code to '.$user->email.'.'
+                : 'We could not send the login code. Check the mail settings, then request a new code.'
         );
     }
 
@@ -179,7 +180,7 @@ class AuthenticatedSessionController extends Controller
             ]);
         }
 
-        $this->twoFactorChallengeService->resend(
+        $mailSent = $this->twoFactorChallengeService->resend(
             $user,
             $challenge['attempt_id'],
             (bool) $payload['remember'],
@@ -187,7 +188,12 @@ class AuthenticatedSessionController extends Controller
             (bool) ($payload['mark_email_as_verified'] ?? false)
         );
 
-        return back()->with('status', 'A new verification code was sent to '.$user->email.'.');
+        return back()->with(
+            $mailSent ? 'status' : 'error',
+            $mailSent
+                ? 'A new verification code was sent to '.$user->email.'.'
+                : 'We could not send a new verification code. Check the mail settings and try again.'
+        );
     }
 
     /**
