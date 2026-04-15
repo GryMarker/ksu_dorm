@@ -12,8 +12,8 @@
             </div>
             <div class="flex items-center gap-2">
                 <x-ksu-button type="button" variant="subtle" onclick="window.print()">Print</x-ksu-button>
-                <x-ksu-badge :variant="$tenant->onboarding_status === \\App\\Models\\Tenant::STATUS_APPROVED ? 'approved' : 'pending'">
-                    {{ \\Illuminate\\Support\\Str::headline($tenant->onboarding_status) }}
+                <x-ksu-badge :variant="$tenant->onboarding_status === \App\Models\Tenant::STATUS_APPROVED ? 'approved' : 'pending'">
+                    {{ \Illuminate\Support\Str::headline($tenant->onboarding_status ?? 'pending') }}
                 </x-ksu-badge>
             </div>
         </div>
@@ -86,7 +86,7 @@
                                         <div class="flex items-center justify-between">
                                             <span class="font-semibold text-ksu-900">Room {{ $reservation->room->code ?? 'N/A' }}</span>
                                             <x-ksu-badge :variant="$reservation->status === 'approved' ? 'approved' : ($reservation->status === 'pending' ? 'pending' : 'info')" size="sm">
-                                                {{ \\Illuminate\\Support\\Str::headline($reservation->status) }}
+                                                {{ \Illuminate\Support\Str::headline($reservation->status) }}
                                             </x-ksu-badge>
                                         </div>
                                         <p class="text-xs text-slate-500">Requested {{ optional($reservation->requested_at)->format('M d, Y') ?? 'N/A' }}</p>
