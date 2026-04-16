@@ -8,6 +8,23 @@ use Illuminate\Validation\Rule;
 
 class TenantApplyRequest extends FormRequest
 {
+    protected function prepareForValidation(): void
+    {
+        $studentId = $this->input('university_id_no');
+
+        if (!is_string($studentId)) {
+            return;
+        }
+
+        $digits = preg_replace('/\D/', '', $studentId);
+
+        if (strlen($digits) > 2 && strlen($digits) <= 8) {
+            $this->merge([
+                'university_id_no' => substr($digits, 0, 2).'-'.substr($digits, 2),
+            ]);
+        }
+    }
+
     public function authorize(): bool
     {
         $user = $this->user();
@@ -37,8 +54,8 @@ class TenantApplyRequest extends FormRequest
             'university_id_no' => [
                 'required',
                 'string',
-                'max:8',
-                'regex:/^\d{2}-\d{5}$/',
+                'max:9',
+                'regex:/^\d{2}-\d{6}$/',
                 Rule::unique('tenants', 'university_id_no')->ignore($this->user()?->tenant?->id),
             ],
             'program' => ['required', 'string', 'max:255'],
@@ -51,7 +68,7 @@ class TenantApplyRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'university_id_no.regex' => 'The student ID must use the format 00-00000.',
+            'university_id_no.regex' => 'The student ID must use the format 00-000000.',
         ];
     }
 }

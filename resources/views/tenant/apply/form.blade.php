@@ -51,7 +51,16 @@
                 method="POST"
                 action="{{ route('tenant.apply.submit') }}"
                 class="space-y-10"
-                x-data="{ loading: false }"
+                x-data="{
+                    loading: false,
+                    formatStudentId(value) {
+                        const digits = value.replace(/\D/g, '').slice(0, 8);
+
+                        return digits.length > 2
+                            ? `${digits.slice(0, 2)}-${digits.slice(2)}`
+                            : digits;
+                    },
+                }"
                 x-on:submit="if (!loading) { loading = true }"
             >
                 @csrf
@@ -111,12 +120,14 @@
                                     type="text"
                                     class="mt-1 block w-full"
                                     :value="old('university_id_no', $tenant->university_id_no)"
-                                    placeholder="00-00000"
-                                    pattern="[0-9]{2}-[0-9]{5}"
-                                    maxlength="8"
+                                    placeholder="00-000000"
+                                    pattern="[0-9]{2}-[0-9]{6}"
+                                    maxlength="9"
+                                    inputmode="numeric"
+                                    x-on:input="$event.target.value = formatStudentId($event.target.value)"
                                     required
                                 />
-                                <p class="text-xs text-slate-500">Format: 00-00000</p>
+                                <p class="text-xs text-slate-500">Format: 00-000000</p>
                                 <x-input-error :messages="$errors->get('university_id_no')" />
                             </div>
                             <div class="space-y-2">

@@ -12,7 +12,21 @@
         </div>
 
         <x-ksu-card>
-            <form method="POST" action="{{ route('tenant.admission.update') }}" class="space-y-6">
+            <form
+                method="POST"
+                action="{{ route('tenant.admission.update') }}"
+                class="space-y-6"
+                x-data="{
+                    type: @js(old('type', $tenant->type)),
+                    formatStudentId(value) {
+                        const digits = value.replace(/\D/g, '').slice(0, 8);
+
+                        return digits.length > 2
+                            ? `${digits.slice(0, 2)}-${digits.slice(2)}`
+                            : digits;
+                    },
+                }"
+            >
                 @csrf
                 <div class="grid gap-5 sm:grid-cols-2">
                     <div class="space-y-2">
@@ -21,6 +35,7 @@
                             id="type"
                             name="type"
                             class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-ksu-600 focus:outline-none focus:ring-ksu-400"
+                            x-model="type"
                         >
                             <option value="student" @selected($tenant->type === 'student')>Student</option>
                             <option value="employee" @selected($tenant->type === 'employee')>Employee</option>
@@ -35,11 +50,13 @@
                             name="university_id_no"
                             type="text"
                             :value="old('university_id_no', $tenant->university_id_no)"
-                            placeholder="00-00000"
-                            pattern="[0-9]{2}-[0-9]{5}"
-                            maxlength="8"
+                            placeholder="00-000000"
+                            x-bind:pattern="type === 'student' ? '[0-9]{2}-[0-9]{6}' : null"
+                            x-bind:maxlength="type === 'student' ? 9 : null"
+                            x-bind:inputmode="type === 'student' ? 'numeric' : null"
+                            x-on:input="if (type === 'student') { $event.target.value = formatStudentId($event.target.value) }"
                         />
-                        <p class="text-xs text-slate-500">Format: 00-00000</p>
+                        <p class="text-xs text-slate-500" x-show="type === 'student'">Format: 00-000000</p>
                         <x-input-error :messages="$errors->get('university_id_no')" />
                     </div>
 
