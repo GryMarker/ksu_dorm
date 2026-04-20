@@ -39,13 +39,6 @@ class AuthenticatedSessionController extends Controller
     {
         $user = $request->authenticate();
 
-        if ($user->isDormMaster()) {
-            Auth::login($user, $request->boolean('remember'));
-            $request->session()->regenerate();
-
-            return redirect()->intended(route('dashboard', absolute: false));
-        }
-
         if ($user->isTenant() && $this->hasValidTrustedTenantDevice($request, $user)) {
             Auth::login($user, $request->boolean('remember'));
             $request->session()->regenerate();

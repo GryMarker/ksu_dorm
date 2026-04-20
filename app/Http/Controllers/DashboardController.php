@@ -40,7 +40,7 @@ class DashboardController extends Controller
         }
 
         if ($user && $user->isPresident()) {
-            return redirect()->route('president.approvals.employees.index');
+            return redirect()->route('president.dashboard');
         }
 
         return app(AdminDashboardController::class)($request);

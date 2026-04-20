@@ -53,7 +53,7 @@ class RegisteredUserController extends Controller
 
         $user->tenant()->create([
             'full_name' => $validated['name'],
-            'gender' => null,
+            'sex' => null,
             'type' => $userType,
             'employee_id_number' => $userType === Tenant::TYPE_EMPLOYEE ? $validated['employee_id_number'] : null,
             'monthly_rate' => $userType === Tenant::TYPE_EMPLOYEE ? Tenant::DEFAULT_EMPLOYEE_MONTHLY_RATE : null,

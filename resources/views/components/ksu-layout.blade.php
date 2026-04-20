@@ -53,6 +53,8 @@
         }
     } elseif ($user->isPresident()) {
         $navItems = [
+            ['label' => 'Dashboard', 'href' => route('president.dashboard'), 'active' => request()->routeIs('president.dashboard')],
+            ['label' => 'Employees', 'href' => route('president.employees.index'), 'active' => request()->routeIs('president.employees.*')],
             ['label' => 'Onboarding', 'href' => route('president.approvals.employees.index'), 'active' => request()->routeIs('president.approvals.employees.*')],
             ['label' => 'Payments', 'href' => route('president.payments.index'), 'active' => request()->routeIs('president.payments.*')],
             ['label' => 'Cottages', 'href' => route('management.cottages.index'), 'active' => request()->routeIs('management.cottages.*')],

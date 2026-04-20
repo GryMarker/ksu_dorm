@@ -22,8 +22,8 @@ class Tenant extends Model
     public const STATUS_REJECTED = 'rejected';
     public const STATUS_RECHECK = 'recheck';
 
-    public const GENDER_MALE = 'male';
-    public const GENDER_FEMALE = 'female';
+    public const SEX_MALE = 'male';
+    public const SEX_FEMALE = 'female';
 
     public const DEFAULT_EMPLOYEE_MONTHLY_RATE = 1800.00;
 
@@ -31,7 +31,7 @@ class Tenant extends Model
         'user_id',
         'full_name',
         'nickname',
-        'gender',
+        'sex',
         'dob',
         'home_address',
         'age',

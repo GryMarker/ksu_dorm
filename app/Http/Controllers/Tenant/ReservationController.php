@@ -26,7 +26,7 @@ class ReservationController extends Controller
             'beds as bed_count',
         ])->with(['beds' => fn ($query) => $query->orderBy('bed_label')])
             ->where('status', Room::STATUS_OPEN)
-            ->when($tenant->gender, fn ($query, $gender) => $query->where('gender', $gender))
+            ->when($tenant->sex, fn ($query, $sex) => $query->where('sex', $sex))
             ->get();
 
         return view('tenant.availability', [
@@ -49,8 +49,8 @@ class ReservationController extends Controller
             return redirect()->back()->withErrors('Room is not available for reservation.');
         }
 
-        if ($tenant->gender && $room->gender !== $tenant->gender) {
-            return redirect()->back()->withErrors('Selected room is not available for your gender.');
+        if ($tenant->sex && $room->sex !== $tenant->sex) {
+            return redirect()->back()->withErrors('Selected room is not available for your sex.');
         }
 
         $selectedBed = null;

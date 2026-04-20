@@ -46,7 +46,7 @@ class DevSeeder extends Seeder
         $employeeTenant = $employeeUser->tenant()->create([
             'full_name' => 'Sample Employee',
             'nickname' => 'Emp',
-            'gender' => Tenant::GENDER_MALE,
+            'sex' => Tenant::SEX_MALE,
             'dob' => Carbon::now()->subYears(30)->subMonths(2),
             'home_address' => 'KSU Administration Building',
             'age' => 30,
@@ -107,9 +107,9 @@ class DevSeeder extends Seeder
         ]);
 
         $rooms = collect([
-            ['code' => 'A-101', 'building' => 'Main', 'floor' => '1', 'wing' => 'North', 'gender' => Room::GENDER_MIXED],
-            ['code' => 'B-201', 'building' => 'Main', 'floor' => '2', 'wing' => 'East', 'gender' => Room::GENDER_FEMALE],
-            ['code' => 'C-301', 'building' => 'Annex', 'floor' => '3', 'wing' => 'West', 'gender' => Room::GENDER_MALE],
+            ['code' => 'A-101', 'building' => 'Main', 'floor' => '1', 'wing' => 'North', 'sex' => Room::SEX_MIXED],
+            ['code' => 'B-201', 'building' => 'Main', 'floor' => '2', 'wing' => 'East', 'sex' => Room::SEX_FEMALE],
+            ['code' => 'C-301', 'building' => 'Annex', 'floor' => '3', 'wing' => 'West', 'sex' => Room::SEX_MALE],
         ])->map(function (array $attributes) {
             $room = Room::create(array_merge($attributes, [
                 'capacity' => 6,
@@ -148,7 +148,7 @@ class DevSeeder extends Seeder
         $draftUser->tenant()->create([
             'full_name' => 'Draft Applicant',
             'nickname' => 'Applicant',
-            'gender' => Tenant::GENDER_FEMALE,
+            'sex' => Tenant::SEX_FEMALE,
             'dob' => Carbon::now()->subYears(18)->subMonths(3),
             'home_address' => 'Tabuk City, Kalinga',
             'age' => 18,
@@ -186,7 +186,7 @@ class DevSeeder extends Seeder
             $tenant = $user->tenant()->create([
                 'full_name' => 'Tenant ' . $i,
                 'nickname' => 'T' . $i,
-                'gender' => $i % 2 === 0 ? Tenant::GENDER_MALE : Tenant::GENDER_FEMALE,
+                'sex' => $i % 2 === 0 ? Tenant::SEX_MALE : Tenant::SEX_FEMALE,
                 'dob' => Carbon::now()->subYears(18 + $i)->subMonths($i),
                 'home_address' => 'Barangay ' . $i . ', Tabuk City',
                 'age' => 18 + $i,

@@ -87,23 +87,51 @@ class AuthenticationTest extends TestCase
         $response->assertSessionHasErrors('code');
     }
 
-    public function test_dorm_masters_can_log_in_without_two_factor_authentication(): void
+    public function test_dorm_masters_must_complete_two_factor_authentication(): void
+    {
+        $this->assertRoleMustCompleteTwoFactorAuthentication(User::ROLE_DORM_MASTER);
+    }
+
+    public function test_presidents_must_complete_two_factor_authentication(): void
+    {
+        $this->assertRoleMustCompleteTwoFactorAuthentication(User::ROLE_PRESIDENT);
+    }
+
+    private function assertRoleMustCompleteTwoFactorAuthentication(string $role): void
     {
         Notification::fake();
 
         $user = User::factory()->create([
-            'role' => User::ROLE_DORM_MASTER,
+            'role' => $role,
         ]);
+        $code = null;
 
         $response = $this->post('/login', [
             'email' => $user->email,
             'password' => 'password',
         ]);
 
+        $this->assertGuest();
+        $response->assertRedirect(route('two-factor.challenge'));
+
+        $session = $this->app['session.store'];
+        $challenge = $session->get('auth.two_factor_login');
+
+        $this->assertIsArray($challenge);
+
+        Notification::assertSentTo($user, LoginTwoFactorCode::class, function (LoginTwoFactorCode $notification) use (&$code) {
+            $code = $notification->code;
+
+            return true;
+        });
+
+        $verifyResponse = $this->post('/login/verify', [
+            'code' => $code,
+        ]);
+
         $this->assertAuthenticatedAs($user);
-        $response->assertRedirect(route('dashboard', absolute: false));
-        Notification::assertNothingSent();
-        $this->assertNull($this->app['session.store']->get('auth.two_factor_login'));
+        $verifyResponse->assertRedirect(route('dashboard', absolute: false));
+        $this->assertNull(Cache::get('login_2fa:'.$challenge['attempt_id']));
     }
 
     public function test_tenant_two_factor_verification_sets_a_trusted_device_cookie(): void

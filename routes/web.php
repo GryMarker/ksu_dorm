@@ -17,6 +17,8 @@ use App\Http\Controllers\Employee\EmployeeDashboardController;
 use App\Http\Controllers\Employee\EmployeePaymentController;
 use App\Http\Controllers\Employee\EmployeeStatusController;
 use App\Http\Controllers\President\EmployeeApprovalController;
+use App\Http\Controllers\President\DashboardController as PresidentDashboardController;
+use App\Http\Controllers\President\EmployeeController as PresidentEmployeeController;
 use App\Http\Controllers\President\EmployeePaymentApprovalController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Public\HomeController;
@@ -76,6 +78,9 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::prefix('president')->middleware('role:president')->group(function () {
+        Route::get('/dashboard', PresidentDashboardController::class)->name('president.dashboard');
+        Route::get('/employees', [PresidentEmployeeController::class, 'index'])->name('president.employees.index');
+        Route::get('/employees/{tenant}/history', [PresidentEmployeeController::class, 'history'])->name('president.employees.history');
         Route::get('/approvals/employees', [EmployeeApprovalController::class, 'index'])->name('president.approvals.employees.index');
         Route::patch('/approvals/employees/{tenant}/approve', [EmployeeApprovalController::class, 'approve'])->name('president.approvals.employees.approve');
         Route::patch('/approvals/employees/{tenant}/reject', [EmployeeApprovalController::class, 'reject'])->name('president.approvals.employees.reject');

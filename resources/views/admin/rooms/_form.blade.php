@@ -24,14 +24,14 @@
     </div>
 
     <div class="space-y-2">
-        <x-input-label for="gender" value="Gender" />
+        <x-input-label for="sex" value="Sex" />
         <select
-            id="gender"
-            name="gender"
+            id="sex"
+            name="sex"
             class="mt-1 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-ksu-600 focus:outline-none focus:ring-ksu-400"
         >
-            @foreach([\App\Models\Room::GENDER_MALE => 'Male', \App\Models\Room::GENDER_FEMALE => 'Female', \App\Models\Room::GENDER_MIXED => 'Mixed'] as $value => $label)
-                <option value="{{ $value }}" @selected(old('gender', $room->gender ?? '') === $value)>
+            @foreach([\App\Models\Room::SEX_MALE => 'Male', \App\Models\Room::SEX_FEMALE => 'Female', \App\Models\Room::SEX_MIXED => 'Mixed'] as $value => $label)
+                <option value="{{ $value }}" @selected(old('sex', $room->sex ?? '') === $value)>
                     {{ $label }}
                 </option>
             @endforeach

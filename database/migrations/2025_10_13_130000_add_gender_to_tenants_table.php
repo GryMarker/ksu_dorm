@@ -9,14 +9,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('tenants', function (Blueprint $table) {
-            $table->enum('gender', ['male', 'female'])->nullable()->after('nickname');
+            $table->enum('sex', ['male', 'female'])->nullable()->after('nickname');
         });
     }
 
     public function down(): void
     {
         Schema::table('tenants', function (Blueprint $table) {
-            $table->dropColumn('gender');
+            $table->dropColumn('sex');
         });
     }
 };

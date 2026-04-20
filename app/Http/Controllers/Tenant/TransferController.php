@@ -31,8 +31,8 @@ class TransferController extends Controller
             return redirect()->back()->withErrors('Selected room is not open for transfers.');
         }
 
-        if ($tenant->gender && $room->gender !== $tenant->gender) {
-            return redirect()->back()->withErrors('Selected room is not available for your gender.');
+        if ($tenant->sex && $room->sex !== $tenant->sex) {
+            return redirect()->back()->withErrors('Selected room is not available for your sex.');
         }
 
         $selectedBed = null;

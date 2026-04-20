@@ -6,7 +6,7 @@
         'Student ID' => $tenant->university_id_no,
         'Program / Year' => trim(($tenant->program ?? $tenant->course_year ?? '') . ($tenant->year_level ? ' - Year ' . $tenant->year_level : '')),
         'Nickname' => $tenant->nickname,
-        'Gender' => $tenant->gender ? \Illuminate\Support\Str::headline($tenant->gender) : null,
+        'Sex' => $tenant->sex ? \Illuminate\Support\Str::headline($tenant->sex) : null,
         'Date of Birth' => optional($tenant->dob)?->format('M d, Y'),
         'Age' => $tenant->age,
         'Phone' => $tenant->cellphone ?? $tenant->phone,

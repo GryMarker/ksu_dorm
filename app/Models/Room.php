@@ -14,16 +14,16 @@ class Room extends Model
     public const STATUS_CLOSED = 'closed';
     public const STATUS_MAINTENANCE = 'maintenance';
 
-    public const GENDER_MALE = 'male';
-    public const GENDER_FEMALE = 'female';
-    public const GENDER_MIXED = 'mixed';
+    public const SEX_MALE = 'male';
+    public const SEX_FEMALE = 'female';
+    public const SEX_MIXED = 'mixed';
 
     protected $fillable = [
         'code',
         'building',
         'floor',
         'wing',
-        'gender',
+        'sex',
         'capacity',
         'status',
     ];

@@ -18,7 +18,7 @@
             </div>
         @endif
 
-        <x-ksu-table :headers="['Code', 'Location', 'Gender', 'Capacity', 'Occupied', 'Assignments', 'Status', '']">
+        <x-ksu-table :headers="['Code', 'Location', 'Sex', 'Capacity', 'Occupied', 'Assignments', 'Status', '']">
             @forelse ($rooms as $room)
                 @php
                     $statusVariant = match ($room->status) {
@@ -35,7 +35,7 @@
                         {{ $room->building }} &middot; Floor {{ $room->floor }}
                     </td>
                     <td class="px-5 py-4 text-sm font-medium capitalize text-ksu-800">
-                        {{ str_replace('_', ' ', $room->gender) }}
+                        {{ str_replace('_', ' ', $room->sex) }}
                     </td>
                     <td class="px-5 py-4 text-sm text-slate-600">
                         {{ $room->capacity }}

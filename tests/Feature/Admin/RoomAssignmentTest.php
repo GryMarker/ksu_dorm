@@ -26,7 +26,7 @@ class RoomAssignmentTest extends TestCase
 
         $tenant = $studentUser->tenant()->create([
             'full_name' => 'Assigned Student',
-            'gender' => Tenant::GENDER_FEMALE,
+            'sex' => Tenant::SEX_FEMALE,
             'type' => Tenant::TYPE_STUDENT,
             'onboarding_status' => Tenant::STATUS_APPROVED,
             'university_id_no' => 'KSU-1001',
@@ -43,7 +43,7 @@ class RoomAssignmentTest extends TestCase
             'building' => 'Main',
             'floor' => '1',
             'wing' => 'East',
-            'gender' => Room::GENDER_FEMALE,
+            'sex' => Room::SEX_FEMALE,
             'capacity' => 6,
             'status' => Room::STATUS_OPEN,
         ]);
@@ -87,7 +87,7 @@ class RoomAssignmentTest extends TestCase
 
         $tenant = $studentUser->tenant()->create([
             'full_name' => 'Transfer Student',
-            'gender' => Tenant::GENDER_MALE,
+            'sex' => Tenant::SEX_MALE,
             'type' => Tenant::TYPE_STUDENT,
             'onboarding_status' => Tenant::STATUS_APPROVED,
             'university_id_no' => 'KSU-1002',
@@ -104,7 +104,7 @@ class RoomAssignmentTest extends TestCase
             'building' => 'Main',
             'floor' => '1',
             'wing' => 'West',
-            'gender' => Room::GENDER_MALE,
+            'sex' => Room::SEX_MALE,
             'capacity' => 6,
             'status' => Room::STATUS_OPEN,
         ]);
@@ -129,7 +129,7 @@ class RoomAssignmentTest extends TestCase
             'building' => 'Annex',
             'floor' => '2',
             'wing' => 'North',
-            'gender' => Room::GENDER_MALE,
+            'sex' => Room::SEX_MALE,
             'capacity' => 6,
             'status' => Room::STATUS_OPEN,
         ]);

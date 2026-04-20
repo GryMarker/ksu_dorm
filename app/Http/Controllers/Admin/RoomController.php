@@ -178,7 +178,7 @@ class RoomController extends Controller
             'building' => ['required', 'string', 'max:100'],
             'floor' => ['required', 'string', 'max:50'],
             'wing' => ['nullable', 'string', 'max:100'],
-            'gender' => ['required', Rule::in([Room::GENDER_MALE, Room::GENDER_FEMALE, Room::GENDER_MIXED])],
+            'sex' => ['required', Rule::in([Room::SEX_MALE, Room::SEX_FEMALE, Room::SEX_MIXED])],
             'capacity' => ['required', 'integer', 'min:1', 'max:6'],
             'status' => ['required', Rule::in([Room::STATUS_OPEN, Room::STATUS_CLOSED, Room::STATUS_MAINTENANCE])],
         ]);

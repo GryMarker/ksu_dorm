@@ -42,7 +42,7 @@ class TenantApplyRequest extends FormRequest
         return [
             'full_name' => ['required', 'string', 'max:255'],
             'nickname' => ['nullable', 'string', 'max:255'],
-            'gender' => ['required', Rule::in([Tenant::GENDER_MALE, Tenant::GENDER_FEMALE])],
+            'sex' => ['required', Rule::in([Tenant::SEX_MALE, Tenant::SEX_FEMALE])],
             'dob' => ['required', 'date', 'before:today'],
             'home_address' => ['required', 'string'],
             'age' => ['required', 'integer', 'min:15', 'max:120'],

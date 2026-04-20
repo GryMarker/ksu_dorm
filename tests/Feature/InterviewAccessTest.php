@@ -22,7 +22,7 @@ class InterviewAccessTest extends TestCase
 
         $tenantUser->tenant()->create([
             'full_name' => 'Interview Tester',
-            'gender' => Tenant::GENDER_FEMALE,
+            'sex' => Tenant::SEX_FEMALE,
             'type' => Tenant::TYPE_STUDENT,
             'onboarding_status' => Tenant::STATUS_FOR_INTERVIEW,
             'university_id_no' => 'TEST-2025',
@@ -56,7 +56,7 @@ class InterviewAccessTest extends TestCase
 
         $tenant = $tenantUser->tenant()->create([
             'full_name' => 'Pending Applicant',
-            'gender' => Tenant::GENDER_MALE,
+            'sex' => Tenant::SEX_MALE,
             'type' => Tenant::TYPE_STUDENT,
             'onboarding_status' => Tenant::STATUS_FOR_INTERVIEW,
             'university_id_no' => 'TEST-3045',

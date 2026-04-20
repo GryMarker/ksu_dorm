@@ -37,7 +37,7 @@ class ApplyController extends Controller
         $tenant->fill([
             'full_name' => $data['full_name'],
             'nickname' => $data['nickname'] ?? null,
-            'gender' => $data['gender'],
+            'sex' => $data['sex'],
             'dob' => $data['dob'],
             'home_address' => $data['home_address'],
             'age' => $data['age'],

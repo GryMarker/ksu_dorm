@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('building');
             $table->string('floor');
             $table->string('wing')->nullable();
-            $table->enum('gender', ['male', 'female', 'mixed'])->default('mixed');
+            $table->enum('sex', ['male', 'female', 'mixed'])->default('mixed');
             $table->unsignedInteger('capacity')->default(6);
             $table->enum('status', ['open', 'closed', 'maintenance'])->default('open');
             $table->timestamps();

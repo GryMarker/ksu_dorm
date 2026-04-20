@@ -32,7 +32,7 @@ class AttendanceQrTest extends TestCase
 
         $tenantUser->tenant()->create([
             'full_name' => 'QR Tenant',
-            'gender' => Tenant::GENDER_FEMALE,
+            'sex' => Tenant::SEX_FEMALE,
             'type' => Tenant::TYPE_STUDENT,
             'onboarding_status' => Tenant::STATUS_APPROVED,
             'university_id_no' => 'QR-1001',

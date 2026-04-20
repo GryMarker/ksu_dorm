@@ -48,8 +48,8 @@
                     <dd class="mt-1">{{ $room->wing ?? '—' }}</dd>
                 </div>
                 <div>
-                    <dt class="font-semibold text-ksu-900">Gender</dt>
-                    <dd class="mt-1 capitalize">{{ $room->gender }}</dd>
+                    <dt class="font-semibold text-ksu-900">Sex</dt>
+                    <dd class="mt-1 capitalize">{{ $room->sex }}</dd>
                 </div>
                 <div>
                     <dt class="font-semibold text-ksu-900">Capacity</dt>

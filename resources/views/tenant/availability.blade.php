@@ -2,14 +2,14 @@
     use App\Models\Tenant as TenantModel;
 
     $buildings = $rooms->pluck('building')->filter()->unique()->sort()->values();
-    $genders = $rooms->pluck('gender')->filter()->unique()->sort()->values();
+    $sexes = $rooms->pluck('sex')->filter()->unique()->sort()->values();
 @endphp
 
 <x-ksu-layout page-title="Room Availability" container="false">
     <div
         class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 py-10"
         x-data="{
-            gender: 'all',
+            sex: 'all',
             building: 'all',
             showVacantOnly: false,
             openRoom: null,
@@ -38,14 +38,14 @@
             <x-ksu-card title="Quick Filters">
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div class="space-y-2">
-                        <label class="text-sm font-semibold text-slate-600">Gender</label>
+                        <label class="text-sm font-semibold text-slate-600">Sex</label>
                         <select
                             class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-ksu-600 focus:outline-none focus:ring-ksu-400"
-                            x-model="gender"
+                            x-model="sex"
                         >
                             <option value="all">All</option>
-                            @foreach($genders as $gender)
-                                <option value="{{ $gender }}">{{ \Illuminate\Support\Str::headline($gender) }}</option>
+                            @foreach($sexes as $sex)
+                                <option value="{{ $sex }}">{{ \Illuminate\Support\Str::headline($sex) }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -95,7 +95,7 @@
                 @endphp
                 <tr
                     x-show="
-                        (gender === 'all' || gender === '{{ $room->gender }}') &&
+                        (sex === 'all' || sex === '{{ $room->sex }}') &&
                         (building === 'all' || building === '{{ $room->building }}') &&
                         (!showVacantOnly || {{ $vacantCount }} > 0)
                     "
@@ -109,7 +109,7 @@
                     </td>
                     <td class="px-5 py-4 text-sm text-slate-600">
                         <div class="flex flex-wrap gap-2 text-xs">
-                            <span class="rounded-full bg-ksu-100 px-3 py-1 font-semibold text-ksu-700">{{ \Illuminate\Support\Str::headline($room->gender) }}</span>
+                            <span class="rounded-full bg-ksu-100 px-3 py-1 font-semibold text-ksu-700">{{ \Illuminate\Support\Str::headline($room->sex) }}</span>
                             <span class="rounded-full bg-slate-100 px-3 py-1 font-semibold text-slate-600">Capacity {{ $room->capacity }}</span>
                             <span class="rounded-full bg-slate-100 px-3 py-1 font-semibold text-slate-600">Occupied {{ $room->occupied_beds_count }}</span>
                         </div>
@@ -190,7 +190,7 @@
                     <div class="flex items-start justify-between gap-4">
                         <div>
                             <h2 class="text-2xl font-semibold text-ksu-900">{{ $room->code }}</h2>
-                            <p class="text-sm text-slate-600">{{ $room->building }} &bull; Floor {{ $room->floor }} &bull; {{ \Illuminate\Support\Str::headline($room->gender) }}</p>
+                            <p class="text-sm text-slate-600">{{ $room->building }} &bull; Floor {{ $room->floor }} &bull; {{ \Illuminate\Support\Str::headline($room->sex) }}</p>
                         </div>
                         <button type="button" class="text-slate-400 hover:text-slate-600" @click="openRoom = null" aria-label="Close">
                             <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
