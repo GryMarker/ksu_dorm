@@ -18,7 +18,7 @@ class TenantAdmissionRequest extends FormRequest
 
         $digits = preg_replace('/\D/', '', $studentId);
 
-        if (strlen($digits) > 2 && strlen($digits) <= 8) {
+        if (strlen($digits) > 2 && strlen($digits) <= 7) {
             $this->merge([
                 'university_id_no' => substr($digits, 0, 2).'-'.substr($digits, 2),
             ]);
@@ -37,10 +37,10 @@ class TenantAdmissionRequest extends FormRequest
             'university_id_no' => [
                 'required',
                 'string',
-                'max:9',
+                'max:8',
                 Rule::when(
                     $this->input('type') === Tenant::TYPE_STUDENT,
-                    ['regex:/^\d{2}-\d{6}$/']
+                    ['regex:/^\d{2}-\d{5}$/']
                 ),
                 Rule::unique('tenants', 'university_id_no')->ignore($this->user()?->tenant?->id),
             ],
@@ -58,7 +58,7 @@ class TenantAdmissionRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'university_id_no.regex' => 'The student ID must use the format 00-000000.',
+            'university_id_no.regex' => 'The student ID must use the format 00-00000.',
         ];
     }
 }

@@ -40,6 +40,14 @@ class AuthenticatedSessionController extends Controller
     {
         $user = $request->authenticate();
 
+        if ($this->shouldBypassTwoFactor()) {
+            Auth::login($user, $request->boolean('remember'));
+            $this->queueTrustedDeviceCookie($request, $user);
+            $request->session()->regenerate();
+
+            return redirect()->intended(route('dashboard', absolute: false));
+        }
+
         if ($this->hasValidTrustedDevice($request, $user)) {
             Auth::login($user, $request->boolean('remember'));
             $request->session()->regenerate();
@@ -247,5 +255,10 @@ class AuthenticatedSessionController extends Controller
     private function deviceUserAgentHash(Request $request): string
     {
         return hash('sha256', $request->userAgent() ?? 'unknown-device');
+    }
+
+    private function shouldBypassTwoFactor(): bool
+    {
+        return app()->environment(['local', 'testing']) && (bool) config('auth.bypass_two_factor');
     }
 }

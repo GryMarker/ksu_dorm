@@ -56,4 +56,25 @@ class RegistrationTest extends TestCase
         $verifyResponse->assertRedirect(route('tenant.apply.form', absolute: false));
         $this->assertNull(Cache::get('login_2fa:'.$challenge['attempt_id']));
     }
+
+    public function test_registration_two_factor_can_be_bypassed_when_testing_bypass_is_enabled(): void
+    {
+        Notification::fake();
+        config(['auth.bypass_two_factor' => true]);
+
+        $response = $this->post('/register', [
+            'name' => 'Bypass User',
+            'email' => 'bypass@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+            'user_type' => 'student',
+        ]);
+
+        $user = User::query()->where('email', 'bypass@example.com')->firstOrFail();
+
+        $this->assertAuthenticatedAs($user);
+        $this->assertNotNull($user->fresh()->email_verified_at);
+        $response->assertRedirect(route('tenant.apply.form', absolute: false));
+        Notification::assertNothingSent();
+    }
 }

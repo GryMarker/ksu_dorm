@@ -53,6 +53,24 @@ class AuthenticationTest extends TestCase
         $this->assertNull(Cache::get('login_2fa:'.$challenge['attempt_id']));
     }
 
+    public function test_two_factor_can_be_bypassed_when_testing_bypass_is_enabled(): void
+    {
+        Notification::fake();
+        config(['auth.bypass_two_factor' => true]);
+
+        $user = User::factory()->create();
+
+        $response = $this->post('/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $this->assertAuthenticatedAs($user);
+        $response->assertRedirect(route('dashboard', absolute: false));
+        $response->assertCookie('trusted_device');
+        Notification::assertNothingSent();
+    }
+
     public function test_users_can_not_authenticate_with_invalid_password(): void
     {
         Notification::fake();

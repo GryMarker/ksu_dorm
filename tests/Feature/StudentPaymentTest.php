@@ -80,7 +80,7 @@ class StudentPaymentTest extends TestCase
             'full_name' => $user->name,
             'type' => Tenant::TYPE_STUDENT,
             'onboarding_status' => Tenant::STATUS_APPROVED,
-            'university_id_no' => '12-345678',
+            'university_id_no' => '12-34567',
             'phone' => '',
             'emergency_contact_name' => '',
             'emergency_contact_phone' => '',

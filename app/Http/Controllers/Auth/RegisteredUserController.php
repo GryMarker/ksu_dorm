@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Services\TwoFactorChallengeService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -70,6 +71,17 @@ class RegisteredUserController extends Controller
             'admission_form_json' => [],
         ]);
 
+        if ($this->shouldBypassTwoFactor()) {
+            $user->forceFill([
+                'email_verified_at' => now(),
+            ])->save();
+
+            Auth::login($user);
+            $request->session()->regenerate();
+
+            return redirect()->route($userType === Tenant::TYPE_EMPLOYEE ? 'employee.apply.form' : 'tenant.apply.form');
+        }
+
         $challenge = $this->twoFactorChallengeService->begin(
             $user,
             false,
@@ -85,5 +97,10 @@ class RegisteredUserController extends Controller
                 ? 'Your account was created. We sent a one-time verification code to '.$user->email.'.'
                 : 'Your account was created, but we could not send the verification code. Check the mail settings, then request a new code.'
         );
+    }
+
+    private function shouldBypassTwoFactor(): bool
+    {
+        return app()->environment(['local', 'testing']) && (bool) config('auth.bypass_two_factor');
     }
 }

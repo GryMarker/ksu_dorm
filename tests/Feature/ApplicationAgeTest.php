@@ -45,7 +45,7 @@ class ApplicationAgeTest extends TestCase
             'father_contact' => '09170000000',
             'mother_name' => 'Mother User',
             'mother_contact' => '09170000001',
-            'university_id_no' => '12-345678',
+            'university_id_no' => '12-34567',
             'program' => 'BSIT',
             'year_level' => '2',
             'cellphone' => '09170000002',

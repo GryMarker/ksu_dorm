@@ -125,4 +125,16 @@ return [
 
     'log_codes' => env('AUTH_LOG_CODES', false),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Two-Factor Bypass
+    |--------------------------------------------------------------------------
+    |
+    | This is only honored in local and testing environments. It allows demo
+    | accounts to sign in without the email code while testing workflows.
+    |
+    */
+
+    'bypass_two_factor' => env('AUTH_BYPASS_TWO_FACTOR', false),
+
 ];

@@ -19,7 +19,7 @@
                 x-data="{
                     type: @js(old('type', $tenant->type)),
                     formatStudentId(value) {
-                        const digits = value.replace(/\D/g, '').slice(0, 8);
+                        const digits = value.replace(/\D/g, '').slice(0, 7);
 
                         return digits.length > 2
                             ? `${digits.slice(0, 2)}-${digits.slice(2)}`
@@ -50,13 +50,13 @@
                             name="university_id_no"
                             type="text"
                             :value="old('university_id_no', $tenant->university_id_no)"
-                            placeholder="00-000000"
-                            x-bind:pattern="type === 'student' ? '[0-9]{2}-[0-9]{6}' : null"
-                            x-bind:maxlength="type === 'student' ? 9 : null"
+                            placeholder="00-00000"
+                            x-bind:pattern="type === 'student' ? '[0-9]{2}-[0-9]{5}' : null"
+                            x-bind:maxlength="type === 'student' ? 8 : null"
                             x-bind:inputmode="type === 'student' ? 'numeric' : null"
                             x-on:input="if (type === 'student') { $event.target.value = formatStudentId($event.target.value) }"
                         />
-                        <p class="text-xs text-slate-500" x-show="type === 'student'">Format: 00-000000</p>
+                        <p class="text-xs text-slate-500" x-show="type === 'student'">Format: 00-00000</p>
                         <x-input-error :messages="$errors->get('university_id_no')" />
                     </div>
 
