@@ -48,7 +48,7 @@ class AuthenticatedSessionController extends Controller
             return redirect()->intended(route('dashboard', absolute: false));
         }
 
-        if ($this->hasValidTrustedDevice($request, $user)) {
+        if ($user->login_two_factor_confirmed_at || $this->hasValidTrustedDevice($request, $user)) {
             Auth::login($user, $request->boolean('remember'));
             $request->session()->regenerate();
 
@@ -138,6 +138,12 @@ class AuthenticatedSessionController extends Controller
         if (($payload['mark_email_as_verified'] ?? false) && ! $user->hasVerifiedEmail()) {
             $user->forceFill([
                 'email_verified_at' => now(),
+            ])->save();
+        }
+
+        if (! $user->login_two_factor_confirmed_at) {
+            $user->forceFill([
+                'login_two_factor_confirmed_at' => now(),
             ])->save();
         }
 

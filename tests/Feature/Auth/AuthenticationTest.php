@@ -51,6 +51,7 @@ class AuthenticationTest extends TestCase
         $this->assertAuthenticatedAs($user);
         $verifyResponse->assertRedirect(route('dashboard', absolute: false));
         $this->assertNull(Cache::get('login_2fa:'.$challenge['attempt_id']));
+        $this->assertNotNull($user->fresh()->login_two_factor_confirmed_at);
     }
 
     public function test_two_factor_can_be_bypassed_when_testing_bypass_is_enabled(): void
@@ -222,6 +223,42 @@ class AuthenticationTest extends TestCase
                 'password' => 'password',
             ])
             ->assertRedirect(route('dashboard', absolute: false));
+
+        $this->assertAuthenticatedAs($user);
+        Notification::assertNothingSent();
+    }
+
+    public function test_completed_two_factor_login_skips_future_challenges_without_cookie(): void
+    {
+        Notification::fake();
+
+        $user = User::factory()->create([
+            'role' => User::ROLE_DORM_MASTER,
+        ]);
+        $code = null;
+
+        $this->withHeader('User-Agent', 'FirstDevice/1.0')->post('/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ])->assertRedirect(route('two-factor.challenge'));
+
+        Notification::assertSentTo($user, LoginTwoFactorCode::class, function (LoginTwoFactorCode $notification) use (&$code) {
+            $code = $notification->code;
+
+            return true;
+        });
+
+        $this->withHeader('User-Agent', 'FirstDevice/1.0')->post('/login/verify', [
+            'code' => $code,
+        ])->assertRedirect(route('dashboard', absolute: false));
+
+        $this->post('/logout');
+        Notification::fake();
+
+        $this->withHeader('User-Agent', 'DifferentDevice/1.0')->post('/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ])->assertRedirect(route('dashboard', absolute: false));
 
         $this->assertAuthenticatedAs($user);
         Notification::assertNothingSent();
