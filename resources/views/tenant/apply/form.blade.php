@@ -53,6 +53,23 @@
                 class="space-y-10"
                 x-data="{
                     loading: false,
+                    dob: @js(old('dob', optional($tenant->dob)->format('Y-m-d'))),
+                    get computedAge() {
+                        if (!this.dob) {
+                            return null;
+                        }
+
+                        const birthDate = new Date(`${this.dob}T00:00:00`);
+                        const today = new Date();
+                        let age = today.getFullYear() - birthDate.getFullYear();
+                        const monthDelta = today.getMonth() - birthDate.getMonth();
+
+                        if (monthDelta < 0 || (monthDelta === 0 && today.getDate() < birthDate.getDate())) {
+                            age--;
+                        }
+
+                        return Number.isFinite(age) && age >= 0 ? age : null;
+                    },
                     formatStudentId(value) {
                         const digits = value.replace(/\D/g, '').slice(0, 8);
 
@@ -94,18 +111,19 @@
                             </div>
                             <div class="space-y-2">
                                 <x-input-label for="dob" value="Date of Birth" />
-                                <x-text-input id="dob" name="dob" type="date" class="mt-1 block w-full" :value="old('dob', optional($tenant->dob)->format('Y-m-d'))" required />
+                                <x-text-input id="dob" name="dob" type="date" class="mt-1 block w-full" x-model="dob" required />
                                 <x-input-error :messages="$errors->get('dob')" />
-                            </div>
-                            <div class="space-y-2">
-                                <x-input-label for="age" value="Age" />
-                                <x-text-input id="age" name="age" type="number" min="15" class="mt-1 block w-full" :value="old('age', $tenant->age)" required />
-                                <x-input-error :messages="$errors->get('age')" />
                             </div>
                             <div class="space-y-2 md:col-span-2">
                                 <x-input-label for="home_address" value="Home Address" />
                                 <textarea id="home_address" name="home_address" rows="3" class="mt-1 block w-full rounded-xl border border-slate-300 bg-white p-3 text-sm text-slate-700 shadow-sm focus:border-ksu-600 focus:outline-none focus:ring-ksu-400" required>{{ old('home_address', $tenant->home_address) }}</textarea>
                                 <x-input-error :messages="$errors->get('home_address')" />
+                            </div>
+                            <div class="space-y-2">
+                                <x-input-label value="Age" />
+                                <div class="mt-1 flex min-h-[42px] items-center rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-ksu-900">
+                                    <span x-text="computedAge !== null ? computedAge : 'Select date of birth'"></span>
+                                </div>
                             </div>
                             <div class="space-y-2">
                                 <x-input-label for="place_of_birth" value="Place of Birth" />

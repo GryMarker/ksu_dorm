@@ -40,7 +40,7 @@ class ApplyController extends Controller
             'sex' => $data['sex'],
             'dob' => $data['dob'],
             'home_address' => $data['home_address'],
-            'age' => $data['age'],
+            'age' => Carbon::parse($data['dob'])->age,
             'place_of_birth' => $data['place_of_birth'],
             'father_name' => $data['father_name'],
             'father_contact' => $data['father_contact'],

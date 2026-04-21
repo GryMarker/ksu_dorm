@@ -163,6 +163,7 @@
                     <div class="grid gap-3">
                         <x-ksu-button as="a" href="{{ route('tenant.apply.form') }}" variant="subtle" full>Update Application</x-ksu-button>
                         <x-ksu-button as="a" href="{{ route('tenant.availability') }}" full>Check Room Availability</x-ksu-button>
+                        <x-ksu-button as="a" href="{{ route('tenant.payments.index') }}" variant="subtle" full>Manage Payments</x-ksu-button>
                         <x-ksu-button as="a" href="{{ route('tenant.attendance.index') }}" variant="outline" full>View Attendance Logs</x-ksu-button>
                     </div>
                 </x-ksu-card>

@@ -37,7 +37,7 @@ class EmployeeApplyController extends Controller
             'sex' => $data['sex'],
             'dob' => $data['dob'],
             'home_address' => $data['home_address'],
-            'age' => $data['age'],
+            'age' => Carbon::parse($data['dob'])->age,
             'place_of_birth' => $data['place_of_birth'],
             'course_year' => $data['department'],
             'cellphone' => $data['cellphone'],

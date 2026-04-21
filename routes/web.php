@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\InterviewSlotController as AdminInterviewSlotCont
 use App\Http\Controllers\Admin\QrAttendanceController as AdminQrAttendanceController;
 use App\Http\Controllers\Admin\ReservationDecisionController;
 use App\Http\Controllers\Admin\RoomController;
+use App\Http\Controllers\Admin\StudentPaymentApprovalController;
 use App\Http\Controllers\Admin\TenantController as AdminTenantController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Employee\EmployeeApplyController;
@@ -27,6 +28,7 @@ use App\Http\Controllers\Tenant\AttendanceController as TenantAttendanceControll
 use App\Http\Controllers\Tenant\InterviewController as TenantInterviewController;
 use App\Http\Controllers\Tenant\QrAttendanceController as TenantQrAttendanceController;
 use App\Http\Controllers\Tenant\ReservationController;
+use App\Http\Controllers\Tenant\StudentPaymentController;
 use App\Http\Controllers\Tenant\TenantDashboardController;
 use App\Http\Controllers\Tenant\TransferController;
 use App\Models\Reservation;
@@ -67,6 +69,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/attendance', [TenantAttendanceController::class, 'index'])->name('tenant.attendance.index');
         Route::get('/attendance/scan', [TenantQrAttendanceController::class, 'show'])->name('tenant.attendance.scan');
         Route::post('/attendance/scan', [TenantQrAttendanceController::class, 'store'])->name('tenant.attendance.scan.store');
+        Route::get('/payments', [StudentPaymentController::class, 'index'])->name('tenant.payments.index');
+        Route::post('/payments', [StudentPaymentController::class, 'store'])->name('tenant.payments.store');
     });
 
     Route::prefix('employee')->middleware(['role:employee', 'employee.approved'])->group(function () {
@@ -113,6 +117,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/admin/reservations/pending', [ReservationDecisionController::class, 'index'])->name('admin.reservations.index');
         Route::patch('/admin/reservations/{reservation}/approve', [ReservationDecisionController::class, 'approve'])->name('admin.reservations.approve');
         Route::patch('/admin/reservations/{reservation}/decline', [ReservationDecisionController::class, 'decline'])->name('admin.reservations.decline');
+        Route::get('/admin/payments', [StudentPaymentApprovalController::class, 'index'])->name('admin.payments.index');
+        Route::patch('/admin/payments/{payment}/approve', [StudentPaymentApprovalController::class, 'approve'])->name('admin.payments.approve');
+        Route::patch('/admin/payments/{payment}/reject', [StudentPaymentApprovalController::class, 'reject'])->name('admin.payments.reject');
 
         Route::get('/admin/attendance', [AdminAttendanceController::class, 'index'])->name('admin.attendance.index');
         Route::get('/admin/attendance/monthly', [AdminAttendanceController::class, 'monthly'])->name('admin.attendance.monthly');

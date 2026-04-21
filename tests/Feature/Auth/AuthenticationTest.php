@@ -134,15 +134,15 @@ class AuthenticationTest extends TestCase
         $this->assertNull(Cache::get('login_2fa:'.$challenge['attempt_id']));
     }
 
-    public function test_tenant_two_factor_verification_sets_a_trusted_device_cookie(): void
+    public function test_two_factor_verification_sets_a_trusted_device_cookie(): void
     {
         Notification::fake();
 
         $user = User::factory()->create([
-            'role' => User::ROLE_TENANT,
+            'role' => User::ROLE_EMPLOYEE,
         ]);
         $code = null;
-        $userAgent = 'TenantTrustedDeviceTest/1.0';
+        $userAgent = 'TrustedDeviceTest/1.0';
 
         $this->withHeader('User-Agent', $userAgent)->post('/login', [
             'email' => $user->email,
@@ -160,7 +160,53 @@ class AuthenticationTest extends TestCase
         ]);
 
         $verifyResponse->assertRedirect(route('dashboard', absolute: false));
-        $verifyResponse->assertCookie('tenant_trusted_device');
+        $verifyResponse->assertCookie('trusted_device');
+    }
+
+    public function test_trusted_device_cookie_skips_future_two_factor_challenges(): void
+    {
+        Notification::fake();
+
+        $user = User::factory()->create([
+            'role' => User::ROLE_DORM_MASTER,
+        ]);
+        $code = null;
+        $userAgent = 'TrustedDeviceRepeatLoginTest/1.0';
+
+        $this->withHeader('User-Agent', $userAgent)->post('/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ])->assertRedirect(route('two-factor.challenge'));
+
+        Notification::assertSentTo($user, LoginTwoFactorCode::class, function (LoginTwoFactorCode $notification) use (&$code) {
+            $code = $notification->code;
+
+            return true;
+        });
+
+        $verifyResponse = $this->withHeader('User-Agent', $userAgent)->post('/login/verify', [
+            'code' => $code,
+        ]);
+
+        $verifyResponse->assertCookie('trusted_device');
+
+        $this->post('/logout');
+        Notification::fake();
+
+        $this->withHeader('User-Agent', $userAgent)
+            ->withCookie('trusted_device', json_encode([
+                'user_id' => $user->id,
+                'user_agent_hash' => hash('sha256', $userAgent),
+                'expires_at' => now()->addDays(90)->toIso8601String(),
+            ]))
+            ->post('/login', [
+                'email' => $user->email,
+                'password' => 'password',
+            ])
+            ->assertRedirect(route('dashboard', absolute: false));
+
+        $this->assertAuthenticatedAs($user);
+        Notification::assertNothingSent();
     }
 
     public function test_email_verification_notice_sends_a_code(): void

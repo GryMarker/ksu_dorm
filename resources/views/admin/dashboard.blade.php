@@ -120,6 +120,9 @@
                     <x-ksu-button as="a" href="{{ route('admin.attendance.index') }}" full variant="outline">Attendance Reports</x-ksu-button>
                     <x-ksu-button as="a" href="{{ route('admin.rooms.index') }}" full>Manage Room Inventory</x-ksu-button>
                     <x-ksu-button as="a" href="{{ route('admin.reservations.index') }}" full variant="subtle">Pending Reservations</x-ksu-button>
+                    @if(auth()->user()?->isDormMaster())
+                        <x-ksu-button as="a" href="{{ route('admin.payments.index') }}" full variant="outline">Review Student Payments</x-ksu-button>
+                    @endif
                 </div>
             </x-ksu-card>
         </div>

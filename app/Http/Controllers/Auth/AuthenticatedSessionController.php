@@ -13,12 +13,13 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use Throwable;
 
 class AuthenticatedSessionController extends Controller
 {
-    private const TENANT_TRUSTED_DEVICE_COOKIE = 'tenant_trusted_device';
+    private const TRUSTED_DEVICE_COOKIE = 'trusted_device';
 
-    private const TENANT_TRUSTED_DEVICE_DAYS = 90;
+    private const TRUSTED_DEVICE_DAYS = 90;
 
     public function __construct(
         private readonly TwoFactorChallengeService $twoFactorChallengeService,
@@ -39,7 +40,7 @@ class AuthenticatedSessionController extends Controller
     {
         $user = $request->authenticate();
 
-        if ($user->isTenant() && $this->hasValidTrustedTenantDevice($request, $user)) {
+        if ($this->hasValidTrustedDevice($request, $user)) {
             Auth::login($user, $request->boolean('remember'));
             $request->session()->regenerate();
 
@@ -132,9 +133,7 @@ class AuthenticatedSessionController extends Controller
             ])->save();
         }
 
-        if ($user->isTenant()) {
-            $this->queueTrustedTenantDeviceCookie($request, $user);
-        }
+        $this->queueTrustedDeviceCookie($request, $user);
 
         $request->session()->regenerate();
 
@@ -203,9 +202,9 @@ class AuthenticatedSessionController extends Controller
         return redirect('/');
     }
 
-    private function hasValidTrustedTenantDevice(Request $request, User $user): bool
+    private function hasValidTrustedDevice(Request $request, User $user): bool
     {
-        $rawCookie = $request->cookie(self::TENANT_TRUSTED_DEVICE_COOKIE);
+        $rawCookie = $request->cookie(self::TRUSTED_DEVICE_COOKIE);
 
         if (! is_string($rawCookie) || $rawCookie === '') {
             return false;
@@ -221,27 +220,31 @@ class AuthenticatedSessionController extends Controller
             return false;
         }
 
-        if (($payload['user_agent_hash'] ?? null) !== $this->tenantDeviceUserAgentHash($request)) {
+        if (($payload['user_agent_hash'] ?? null) !== $this->deviceUserAgentHash($request)) {
             return false;
         }
 
-        return isset($payload['expires_at']) && now()->lt(Carbon::parse($payload['expires_at']));
+        try {
+            return isset($payload['expires_at']) && now()->lt(Carbon::parse($payload['expires_at']));
+        } catch (Throwable) {
+            return false;
+        }
     }
 
-    private function queueTrustedTenantDeviceCookie(Request $request, User $user): void
+    private function queueTrustedDeviceCookie(Request $request, User $user): void
     {
         Cookie::queue(cookie(
-            self::TENANT_TRUSTED_DEVICE_COOKIE,
+            self::TRUSTED_DEVICE_COOKIE,
             json_encode([
                 'user_id' => $user->id,
-                'user_agent_hash' => $this->tenantDeviceUserAgentHash($request),
-                'expires_at' => now()->addDays(self::TENANT_TRUSTED_DEVICE_DAYS)->toIso8601String(),
+                'user_agent_hash' => $this->deviceUserAgentHash($request),
+                'expires_at' => now()->addDays(self::TRUSTED_DEVICE_DAYS)->toIso8601String(),
             ], JSON_THROW_ON_ERROR),
-            self::TENANT_TRUSTED_DEVICE_DAYS * 24 * 60
+            self::TRUSTED_DEVICE_DAYS * 24 * 60
         ));
     }
 
-    private function tenantDeviceUserAgentHash(Request $request): string
+    private function deviceUserAgentHash(Request $request): string
     {
         return hash('sha256', $request->userAgent() ?? 'unknown-device');
     }

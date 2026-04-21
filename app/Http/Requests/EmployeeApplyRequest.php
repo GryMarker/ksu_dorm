@@ -19,15 +19,21 @@ class EmployeeApplyRequest extends FormRequest
             'full_name' => ['required', 'string', 'max:255'],
             'nickname' => ['nullable', 'string', 'max:255'],
             'sex' => ['required', Rule::in([Tenant::SEX_MALE, Tenant::SEX_FEMALE])],
-            'dob' => ['required', 'date', 'before:today'],
+            'dob' => ['required', 'date', 'before:today', 'before_or_equal:'.now()->subYears(18)->toDateString()],
             'home_address' => ['required', 'string'],
-            'age' => ['required', 'integer', 'min:15', 'max:120'],
             'place_of_birth' => ['required', 'string', 'max:255'],
             'department' => ['required', 'string', 'max:255'],
             'cellphone' => ['required', 'string', 'max:100'],
             'salary_deduction' => ['nullable', 'boolean'],
             'family_members' => ['nullable', 'string'],
             'accept_terms' => ['accepted'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'dob.before_or_equal' => 'The date of birth must indicate an age of at least 18 years.',
         ];
     }
 }

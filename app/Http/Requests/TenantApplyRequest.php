@@ -43,9 +43,8 @@ class TenantApplyRequest extends FormRequest
             'full_name' => ['required', 'string', 'max:255'],
             'nickname' => ['nullable', 'string', 'max:255'],
             'sex' => ['required', Rule::in([Tenant::SEX_MALE, Tenant::SEX_FEMALE])],
-            'dob' => ['required', 'date', 'before:today'],
+            'dob' => ['required', 'date', 'before:today', 'before_or_equal:'.now()->subYears(15)->toDateString()],
             'home_address' => ['required', 'string'],
-            'age' => ['required', 'integer', 'min:15', 'max:120'],
             'place_of_birth' => ['required', 'string', 'max:255'],
             'father_name' => ['required', 'string', 'max:255'],
             'father_contact' => ['required', 'string', 'max:100'],
@@ -69,6 +68,7 @@ class TenantApplyRequest extends FormRequest
     {
         return [
             'university_id_no.regex' => 'The student ID must use the format 00-000000.',
+            'dob.before_or_equal' => 'The date of birth must indicate an age of at least 15 years.',
         ];
     }
 }

@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Employee;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\EmployeePaymentRequest;
+use App\Mail\EmployeePaymentSubmittedMail;
 use App\Models\EmployeePayment;
 use App\Models\Tenant;
+use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -49,7 +52,7 @@ class EmployeePaymentController extends Controller
         $amount = $validated['amount'] ?? $tenant->monthly_rate ?? Tenant::DEFAULT_EMPLOYEE_MONTHLY_RATE;
 
         try {
-            $tenant->employeePayments()->create([
+            $payment = $tenant->employeePayments()->create([
                 'billing_month' => $billingMonth,
                 'amount' => $amount,
                 'salary_deduction' => $salaryDeduction,
@@ -65,6 +68,21 @@ class EmployeePaymentController extends Controller
 
             throw $exception;
         }
+
+        $payment->load('tenant.user');
+
+        User::where('role', User::ROLE_PRESIDENT)->get()
+            ->each(fn (User $president) => NotificationService::queueMail(
+                $president,
+                new EmployeePaymentSubmittedMail($payment),
+                'employee.payment.submitted',
+                [
+                    'payment_id' => $payment->id,
+                    'tenant_id' => $tenant->id,
+                    'billing_month' => $billingMonth->toDateString(),
+                    'amount' => $payment->amount,
+                ]
+            ));
 
         return redirect()
             ->route('employee.payments.index')

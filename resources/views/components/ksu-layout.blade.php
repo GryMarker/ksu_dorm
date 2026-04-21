@@ -25,6 +25,7 @@
                 ['label' => 'Room Availability', 'href' => route('tenant.availability'), 'active' => request()->routeIs('tenant.availability')],
                 ['label' => 'My Room', 'href' => route('tenant.myroom'), 'active' => request()->routeIs('tenant.myroom')],
                 ['label' => 'Attendance', 'href' => route('tenant.attendance.index'), 'active' => request()->routeIs('tenant.attendance.*')],
+                ['label' => 'Payments', 'href' => route('tenant.payments.index'), 'active' => request()->routeIs('tenant.payments.*')],
                 ['label' => 'Profile', 'href' => route('profile.edit'), 'active' => request()->routeIs('profile.edit')],
             ];
         } else {
@@ -67,6 +68,9 @@
             ['label' => 'Applications', 'href' => route('admin.applications.index'), 'active' => request()->routeIs('admin.applications.*')],
             ['label' => 'Rooms', 'href' => route('admin.rooms.index'), 'active' => request()->routeIs('admin.rooms.*')],
             ['label' => 'Reservations', 'href' => route('admin.reservations.index'), 'active' => request()->routeIs('admin.reservations.*')],
+            ...($user->isDormMaster() ? [
+                ['label' => 'Payments', 'href' => route('admin.payments.index'), 'active' => request()->routeIs('admin.payments.*')],
+            ] : []),
             ['label' => 'Interview Slots', 'href' => route('admin.interview-slots.index'), 'active' => request()->routeIs('admin.interview-slots.*')],
             ['label' => 'Interviews', 'href' => route('admin.interviews.index'), 'active' => request()->routeIs('admin.interviews.*')],
             ['label' => 'Attendance', 'href' => route('admin.attendance.index'), 'active' => request()->routeIs('admin.attendance.*')],

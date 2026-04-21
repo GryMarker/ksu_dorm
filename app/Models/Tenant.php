@@ -96,6 +96,11 @@ class Tenant extends Model
         return $this->hasMany(EmployeePayment::class);
     }
 
+    public function studentPayments(): HasMany
+    {
+        return $this->hasMany(StudentPayment::class);
+    }
+
     public function interviews(): HasMany
     {
         return $this->hasMany(Interview::class);
