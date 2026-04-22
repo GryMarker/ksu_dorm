@@ -21,6 +21,11 @@ class AttendanceQrService
         return Carbon::createFromTimestamp($windowStart)->addSeconds(self::WINDOW_SECONDS);
     }
 
+    public function signatureExpiresAtForWindow(int $windowStart): Carbon
+    {
+        return $this->expiresAtForWindow($windowStart)->addSeconds(self::WINDOW_SECONDS);
+    }
+
     public function currentPayload(?Carbon $time = null): array
     {
         $windowStart = $this->currentWindowStart($time);
@@ -31,8 +36,9 @@ class AttendanceQrService
             'expires_at' => $expiresAt->toIso8601String(),
             'scan_url' => URL::temporarySignedRoute(
                 'tenant.attendance.scan',
-                $expiresAt,
-                ['window' => $windowStart]
+                $this->signatureExpiresAtForWindow($windowStart),
+                ['window' => $windowStart],
+                false
             ),
         ];
     }

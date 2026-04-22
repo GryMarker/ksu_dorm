@@ -21,7 +21,7 @@ class QrAttendanceController extends Controller
         $tenant = $request->user()->tenant()->firstOrFail();
         $windowStart = (int) $request->integer('window');
 
-        if (! $request->hasValidSignature() || ! $this->attendanceQrService->isWindowCurrentOrPrevious($windowStart)) {
+        if (! $request->hasValidSignature(false) || ! $this->attendanceQrService->isWindowCurrentOrPrevious($windowStart)) {
             return redirect()->route('tenant.attendance.index')->withErrors('That QR code is no longer valid. Please scan the latest code.');
         }
 
@@ -40,7 +40,7 @@ class QrAttendanceController extends Controller
         $tenant = $request->user()->tenant()->firstOrFail();
         $windowStart = (int) $request->integer('window');
 
-        if (! $request->hasValidSignature() || ! $this->attendanceQrService->isWindowCurrentOrPrevious($windowStart)) {
+        if (! $request->hasValidSignature(false) || ! $this->attendanceQrService->isWindowCurrentOrPrevious($windowStart)) {
             return redirect()->route('tenant.attendance.index')->withErrors('That QR code is no longer valid. Please scan the latest code.');
         }
 

@@ -55,10 +55,13 @@
                 countdown: 30,
                 timer: null,
                 poller: null,
+                scanUrl() {
+                    return new URL(this.qr.scan_url, window.location.origin).toString();
+                },
                 async renderQr() {
                     if (!window.QRCode?.toDataURL) return;
 
-                    this.$refs.qrImage.src = await window.QRCode.toDataURL(this.qr.scan_url, {
+                    this.$refs.qrImage.src = await window.QRCode.toDataURL(this.scanUrl(), {
                         width: 512,
                         margin: 1,
                         color: { dark: '#0f172a', light: '#ffffff' },
